@@ -24,10 +24,6 @@ class AwsManager:
     def s3(self):
         return S3Manager(self.manager_access_key, self.manager_secret_key, self.manager_profile)
 
-    @property
-    def vpc(self):
-        return VpcManager(self.manager_access_key, self.manager_secret_key, self.manager_profile)
-
 
     def __init__(self, region, access_key=None, secret_key=None, profile=None):
         # AwsBase.region - Region is shared between services

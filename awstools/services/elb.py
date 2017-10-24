@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from base import AwsBase
 
-
 class ElbManager(AwsBase):
 
     def get_elbs(self):
