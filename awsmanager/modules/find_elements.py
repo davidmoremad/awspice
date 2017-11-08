@@ -20,6 +20,14 @@ class ModuleFindElements:
             if volume:
                 return volume[0]
 
+    def find_volumes(self, aws, filter_key, filter_value):
+        results = []
+        for region in aws.ec2.get_regions():
+            aws.ec2.change_region(region['RegionName'])
+            results.extend(aws.ec2.get_volumes_by(filter_key, filter_value))
+        return results
+
+
     def find_snapshot(self, aws, filter_key, filter_value):
         for region in aws.ec2.get_regions():
             aws.ec2.change_region(region['RegionName'])
