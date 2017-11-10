@@ -93,6 +93,11 @@ class ModuleCommon():
         elbinstances = map(lambda x: x['InstanceId'], elb[0]['Instances'])
         results['Instances'] = aws.ec2.client.describe_instance_status(InstanceIds=elbinstances)['InstanceStatuses']
 
+        secgroups = list()
+        for elb_sg in results['SecurityGroups']:
+            secgroups.append(aws.ec2.get_secgroup_by('id',elb_sg))
+        results['SecurityGroups'] = secgroups
+
         return {'LoadBalancer': results}
 
     def get_instance_portlisting(self, aws, instanceid):
