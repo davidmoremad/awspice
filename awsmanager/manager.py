@@ -9,23 +9,23 @@ class AwsManager:
     def service(self):
         return self.aws
 
-    def find_instance(self, filter_key, value):
-        return ModuleFindElements().find_instance(self.aws, filter_key, value)
+    def find_instance(self, filter_key, filter_value, account_switch=None):
+        return ModuleFindElements().find_instance(self.aws, filter_key, filter_value, account_switch)
 
-    def find_instances(self, filter_key, value):
-        return ModuleFindElements().find_instances(self.aws, filter_key, value)
+    def find_instances(self, filter_key, filter_value, account_switch=None):
+        return ModuleFindElements().find_instances(self.aws, filter_key, filter_value, account_switch)
 
-    def find_snapshot(self, filter_key, value):
-        return ModuleFindElements().find_snapshot(self.aws, filter_key, value)
+    def find_snapshot(self, filter_key, filter_value):
+        return ModuleFindElements().find_snapshot(self.aws, filter_key, filter_value)
 
-    def find_snapshots(self, filter_key, value):
-        return ModuleFindElements().find_snapshots(self.aws, filter_key, value)
+    def find_snapshots(self, filter_key, filter_value):
+        return ModuleFindElements().find_snapshots(self.aws, filter_key, filter_value)
 
-    def find_volume(self, filter_key, value):
-        return ModuleFindElements().find_volume(self.aws, filter_key, value)
+    def find_volume(self, filter_key, filter_value):
+        return ModuleFindElements().find_volume(self.aws, filter_key, filter_value)
 
-    def find_volumes(self, filter_key, value):
-        return ModuleFindElements().find_volumes(self.aws, filter_key, value)
+    def find_volumes(self, filter_key, filter_value):
+        return ModuleFindElements().find_volumes(self.aws, filter_key, filter_value)
 
 
 

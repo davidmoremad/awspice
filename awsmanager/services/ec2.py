@@ -54,59 +54,31 @@ class Ec2Service(AwsBase):
     # ----------- INSTANCES -----------
     # #################################
 
-    def get_all_instances(self):
-        '''
-        Get all instances of all regions
+    def _extract_instances(self, filters=[], region_switch=False, return_first=False):
+        results = list()
 
-        Return:
-            List of dictionaries with all instances
-        '''
-        instance_list = []
-
-        for aws_region in self.get_regions():
-            self.change_region(aws_region['RegionName'])
-            instance_list.extend(self.get_instances())
-
-        return instance_list
-
-    def get_all_instances_by(self, filter_key, filter_value):
-        '''
-        Get all instances of all region using filters
-
-        Args:
-            filter_key (str): Name of the filter
-            filter_value (str): Value of the filter
-
-        Return:
-            List of dictionaries with all instances that matches
-        '''
-        results = []
-
-        for region in self.get_regions():
+        regions = self.get_regions() if region_switch else [{'RegionName': AwsBase.region}]
+        for region in regions:
             self.change_region(region['RegionName'])
-            instances = self.get_instances_by(filter_key, filter_value)
-            results.extend(instances)
+
+            reservations = self.client.describe_instances(Filters=filters)["Reservations"]
+            for reserv in reservations:
+                instances = self.inject_region(reserv['Instances'])
+                if return_first and instances: return instances[0]
+                results.extend(instances)
 
         return results
 
-    def get_instances(self):
+    def get_instances(self, region_switch=False):
         '''
         Get all instances for a region
 
         Returns:
             List of dictionaries with all instances
         '''
-        reservations =  self.client.describe_instances()
+        return self._extract_instances(region_switch=region_switch)
 
-        results = []
-        for reserv in reservations["Reservations"]:
-            for instance in reserv['Instances']:
-                instance['RegionName'] = AwsBase.region
-                results.append(instance)
-
-        return results
-
-    def get_instance_by(self, filter_key, filter_value):
+    def get_instance_by(self, filter_key, filter_value, region_switch=False):
         '''
         Get an instance for a region that matches with filter
 
@@ -117,13 +89,17 @@ class Ec2Service(AwsBase):
         Return:
             Instance that matches with filters
         '''
-        result = self.get_instances_by(filter_key, filter_value)
-        if len(result) > 0:
-            return result[0]
-        else:
-            return None
+        if filter_key not in self.instance_filters:
+            raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
 
-    def get_instances_by(self, filter_key, filter_value):
+        filters = [{
+            'Name': self.instance_filters[filter_key],
+            'Values': [filter_value]
+        }]
+
+        return self._extract_instances(filters=filters, region_switch=region_switch, return_first=True)
+
+    def get_instances_by(self, filter_key, filter_value, region_switch=False):
         '''
         Get all instances for a region using filters
 
@@ -134,19 +110,15 @@ class Ec2Service(AwsBase):
         Return:
             List of dictionaries with all instances that matches
         '''
-
-        if filter_key in self.instance_filters:
-            filters = [{
-                'Name': self.instance_filters[filter_key],
-                'Values': [filter_value]
-            }]
-
-            results = []
-            for reservation in self.client.describe_instances(Filters=filters)["Reservations"]:
-                results.extend(self.inject_region(reservation['Instances']))
-            return results
-        else:
+        if filter_key not in self.instance_filters:
             raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
+
+        filters = [{
+            'Name': self.instance_filters[filter_key],
+            'Values': [filter_value]
+        }]
+
+        return self._extract_instances(filters=filters, region_switch=region_switch)
 
 
 

@@ -65,8 +65,31 @@ class AwsBase:
         results = []
         for element in elements:
             element['RegionName'] = AwsBase.region
+            if AwsBase.profile:
+                element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
+            elif AwsBase.access_key and AwsBase.secret_key:
+                element['Authorization'] = {'Type':'AccessKeys', 'Value':AwsBase.access_key}
             results.append(element)
         return results
+
+
+    def get_accounts(self):
+        '''
+        Get a list of all available accounts
+        Args:
+            account (str): Profile name              (i.e.: account01)
+        '''
+        return boto3.Session().available_profiles
+
+
+    def change_account(self, account):
+        '''
+        Change account of the client keeping the region
+        Args:
+            account (str): Profile name              (i.e.: account01)
+        '''
+        AwsBase.profile = account
+        self.set_client(self.service, region=AwsBase.region, profile=AwsBase.profile)
 
 
     def change_region(self, region):
