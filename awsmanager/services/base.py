@@ -69,6 +69,8 @@ class AwsBase:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
             elif AwsBase.access_key and AwsBase.secret_key:
                 element['Authorization'] = {'Type':'AccessKeys', 'Value':AwsBase.access_key}
+            else:
+                element['Authorization'] = {'Type':'Profile', 'Value': 'default'}
             results.append(element)
         return results
 

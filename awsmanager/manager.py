@@ -9,11 +9,11 @@ class AwsManager:
     def service(self):
         return self.aws
 
-    def find_instance(self, filter_key, filter_value, account_switch=None):
-        return ModuleFindElements().find_instance(self.aws, filter_key, filter_value, account_switch)
+    def find_instance(self, filter_key, filter_value, accounts=[]):
+        return ModuleFindElements().find_instance(self.aws, filter_key, filter_value, accounts)
 
-    def find_instances(self, filter_key, filter_value, account_switch=None):
-        return ModuleFindElements().find_instances(self.aws, filter_key, filter_value, account_switch)
+    def find_instances(self, filter_key, filter_value, accounts=[]):
+        return ModuleFindElements().find_instances(self.aws, filter_key, filter_value, accounts)
 
     def find_snapshot(self, filter_key, filter_value):
         return ModuleFindElements().find_snapshot(self.aws, filter_key, filter_value)

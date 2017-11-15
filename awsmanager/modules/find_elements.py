@@ -2,22 +2,21 @@
 
 class ModuleFindElements:
 
-    def find_instance(self, aws, filter_key, filter_value, account_switch=None):
-        if account_switch:
-            accounts = aws.ec2.get_accounts() if account_switch == 'all' else [account_switch]
+    def find_instance(self, aws, filter_key, filter_value, accounts=[]):
+        if isinstance(accounts, list) and len(accounts) > 0:
+            if (accounts[0] == 'ALL'): accounts = aws.ec2.get_accounts()
             for account in accounts:
                 aws.ec2.change_account(account)
                 instance = aws.ec2.get_instance_by(filter_key, filter_value, region_switch=True)
                 if instance: return instance
+            return None
         else:
             return aws.ec2.get_instance_by(filter_key, filter_value, region_switch=True)
-        return None
 
-    def find_instances(self, aws, filter_key, filter_value, account_switch=None):
+    def find_instances(self, aws, filter_key, filter_value, accounts=[]):
         results = list()
-
-        if account_switch:
-            accounts = aws.ec2.get_accounts() if account_switch == 'all' else [account_switch]
+        if isinstance(accounts, list) and len(accounts) > 0:
+            if (accounts[0] == 'ALL'): accounts = aws.ec2.get_accounts()
             for account in accounts:
                 aws.ec2.change_account(account)
                 results.extend(aws.ec2.get_instances_by(filter_key, filter_value, region_switch=True))
