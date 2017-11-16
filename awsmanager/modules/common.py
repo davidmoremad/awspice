@@ -60,7 +60,7 @@ class ModuleCommon():
             adds = aws.ec2.get_addresses()
             savings['Addresses'] = filter(lambda x: x.get('AssociationId') == None, adds)
             elbs = aws.elb.get_elbs()
-            savings['Balancers'] = filter(lambda x: x.get('Instances') == [], elbs)
+            savings['LoadBalancers'] = filter(lambda x: x.get('Instances') == [], elbs)
 
             results[region['RegionName']] = savings
         return {'Regions': results}
@@ -77,6 +77,7 @@ class ModuleCommon():
             Dict with element LoadBalancer with its instances
         '''
         results = dict()
+        ######## Get CNAME of ELB if exists #######
         try:
             cname = str(dns.resolver.query(domain, "CNAME")[0]).rstrip('.')
             if 'aws.com' not in cname: raise Exception
@@ -84,11 +85,16 @@ class ModuleCommon():
             print('[!] Domain {} is not in AWS').format(domain)
             return None
 
+        ######## Search ELB in AWS #######
         for region in aws.ec2.get_regions():
             aws.ec2.change_region(region['RegionName'])
             elb = [elb for elb in aws.elb.get_elbs() if elb['DNSName'] == cname]
-            if elb: break
-        results.update(elb[0])
+            if len(elb) > 0:
+                results = elb[0]
+                break;
+
+        if len(results) == 0:
+            return None
 
         elbinstances = map(lambda x: x['InstanceId'], elb[0]['Instances'])
         results['Instances'] = aws.ec2.client.describe_instance_status(InstanceIds=elbinstances)['InstanceStatuses']
