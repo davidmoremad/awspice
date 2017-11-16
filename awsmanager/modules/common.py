@@ -88,11 +88,11 @@ class ModuleCommon():
         ######## Search ELB in AWS #######
         for region in aws.ec2.get_regions():
             aws.ec2.change_region(region['RegionName'])
-            elb = [elb for elb in aws.elb.get_elbs() if elb['DNSName'] == cname]
+            elb = [elb for elb in aws.elb.get_elbs() if elb['DNSName'].lower() == cname.lower()]
             if len(elb) > 0:
                 results = elb[0]
                 break;
-
+            
         if len(results) == 0:
             return None
 
