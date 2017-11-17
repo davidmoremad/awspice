@@ -10,7 +10,7 @@ class RdsService(AwsBase):
         Returns:
             List of arrays with all RDS instances
         '''
-        return self.client.describe_db_instances()['DBInstances']
+        return self.inject_client_vars(self.client.describe_db_instances()['DBInstances'])
 
     def __init__(self):
         AwsBase.__init__(self, 'rds')

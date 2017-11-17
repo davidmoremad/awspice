@@ -10,7 +10,7 @@ class S3Service(AwsBase):
         Returns:
             List of arrays with all buckets
         '''
-        return self.client.list_buckets()['Buckets']
+        return self.inject_client_vars(self.client.list_buckets()['Buckets'])
 
     def __init__(self):
         AwsBase.__init__(self, 's3')

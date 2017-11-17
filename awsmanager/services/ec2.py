@@ -34,51 +34,36 @@ class Ec2Service(AwsBase):
     }
 
 
-    # #################################
-    # ------------ REGIONS ------------
-    # #################################
-
-    def get_regions(self):
-        '''
-        Get all available regions
-
-        Returns:
-            regions (dict): List of regions with 'Endpoint' & 'RegionName'.
-        '''
-        regions = self.client.describe_regions()['Regions']
-        return regions
-
-
 
     # #################################
     # ----------- INSTANCES -----------
     # #################################
 
-    def _extract_instances(self, filters=[], region_switch=False, return_first=False):
+    def _extract_instances(self, filters=[], regions=[], return_first=False):
         results = list()
 
-        regions = self.get_regions() if region_switch else [{'RegionName': AwsBase.region}]
+        regions = self.parse_regions(regions)
         for region in regions:
             self.change_region(region['RegionName'])
 
             reservations = self.client.describe_instances(Filters=filters)["Reservations"]
             for reserv in reservations:
-                instances = self.inject_region(reserv['Instances'])
+                instances = self.inject_client_vars(reserv['Instances'])
                 if return_first and instances: return instances[0]
                 results.extend(instances)
 
         return results
 
-    def get_instances(self, region_switch=False):
+    def get_instances(self, regions=[]):
         '''
         Get all instances for a region
 
         Returns:
             List of dictionaries with all instances
         '''
-        return self._extract_instances(region_switch=region_switch)
+        return self._extract_instances(regions=regions)
 
-    def get_instance_by(self, filter_key, filter_value, region_switch=False):
+    def get_instance_by(self, filter_key, filter_value, regions=[]):
         '''
         Get an instance for a region that matches with filter
 
@@ -89,17 +74,9 @@ class Ec2Service(AwsBase):
         Return:
             Instance that matches with filters
         '''
-        if filter_key not in self.instance_filters:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
+        return self.get_instances_by(filter_key, filter_value, regions, return_first=True)
 
-        filters = [{
-            'Name': self.instance_filters[filter_key],
-            'Values': [filter_value]
-        }]
-
-        return self._extract_instances(filters=filters, region_switch=region_switch, return_first=True)
-
-    def get_instances_by(self, filter_key, filter_value, region_switch=False):
+    def get_instances_by(self, filter_key, filter_value, regions=[], return_first=False):
         '''
         Get all instances for a region using filters
 
@@ -118,7 +95,7 @@ class Ec2Service(AwsBase):
             'Values': [filter_value]
         }]
 
-        return self._extract_instances(filters=filters, region_switch=region_switch)
+        return self._extract_instances(filters=filters, regions=regions, return_first=return_first)
 
 
 
@@ -126,25 +103,44 @@ class Ec2Service(AwsBase):
     # ------------ VOLUMES ------------
     # #################################
 
-    def get_volumes(self):
+    def _extract_volumes(self, filters=[], regions=[], return_first=False):
+        results = list()
+
+        regions = self.parse_regions(regions)
+        for region in regions:
+            self.change_region(region['RegionName'])
+
+            volumes = self.client.describe_volumes(Filters=filters)['Volumes']
+            volumes = self.inject_client_vars(volumes)
+            if return_first and len(volumes) > 0: return volumes[0]
+            results.extend(volumes)
+
+        return results
+
+    def get_volumes(self, regions=[]):
         '''
         Get all volumes for a region
 
         Returns:
             List of dictionaries with all volumes
         '''
-        return self.inject_region(self.client.describe_volumes()['Volumes'])
+        return self._extract_volumes(region_switch=region_switch)
 
-    def get_volumes_by(self, filter_key, filter_value):
-        if filter_key in self.volume_filters:
-            filters = [{
-                'Name': self.volume_filters[filter_key],
-                'Values': [filter_value]
-            }]
-            return  self.inject_region(self.client.describe_volumes(Filters=filters)['Volumes'])
+    def get_volume_by(self, filter_key, filter_value, regions=[]):
+        return self.get_volumes_by(filter_key, filter_value, regions, return_first=True)
 
-        else:
-            return Exception('Invalid filter key. Allowed filters: ' + str(self.volume_filters.keys()))
+    def get_volumes_by(self, filter_key, filter_value, regions=[], return_first=False):
+
+        if filter_key not in self.instance_filters:
+            raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
+
+        filters = [{
+            'Name': self.volume_filters[filter_key],
+            'Values': [filter_value]
+        }]
+
+        return self._extract_volumes(filters=filters, regions=regions, return_first=return_first)
+
 
 
 
@@ -159,7 +155,7 @@ class Ec2Service(AwsBase):
         Returns:
             List of dictionaries with snapshots
         '''
-        return self.inject_region(self.client.describe_snapshots(OwnerIds=['self'])['Snapshots'])
+        return self.inject_client_vars(self.client.describe_snapshots(OwnerIds=['self'])['Snapshots'])
 
     def get_snapshot_by(self, filter_key, filter_value):
         '''
@@ -186,7 +182,7 @@ class Ec2Service(AwsBase):
                 'Name': self.snapshot_filters[filter_key],
                 'Values': [filter_value]
             }]
-            return self.inject_region(self.client.describe_snapshots(Filters=filters)['Snapshots'])
+            return self.inject_client_vars(self.client.describe_snapshots(Filters=filters)['Snapshots'])
         else:
             raise Exception('Invalid filter key. Allowed filters: ' + str(self.snapshot_filters.keys()))
 
@@ -203,7 +199,7 @@ class Ec2Service(AwsBase):
         Returns:
             list of dictionaries with SecurityGroups.
         '''
-        return self.inject_region(self.client.describe_security_groups()['SecurityGroups'])
+        return self.inject_client_vars(self.client.describe_security_groups()['SecurityGroups'])
 
     def get_secgroup_by(self, filter_key, filter_value):
         '''
@@ -238,7 +234,7 @@ class Ec2Service(AwsBase):
                 'Name': self.secgroup_filters[filter_key],
                 'Values': [filter_value]
             }]
-            return self.inject_region(self.client.describe_security_groups(Filters=filters)['SecurityGroups'])
+            return self.inject_client_vars(self.client.describe_security_groups(Filters=filters)['SecurityGroups'])
         else:
             raise Exception('Invalid filter key. Allowed filters: ' + str(self.secgroup_filters.keys()))
 
@@ -255,7 +251,7 @@ class Ec2Service(AwsBase):
         Returns:
             list of dictionaries with all addresses
         '''
-        return self.inject_region(self.client.describe_addresses()['Addresses'])
+        return self.inject_client_vars(self.client.describe_addresses()['Addresses'])
 
     def get_addresses_by(self, filter_key, filter_value):
         '''
@@ -269,7 +265,7 @@ class Ec2Service(AwsBase):
                 'Name': self.address_filters[filter_key],
                 'Values': [filter_value]
             }]
-            return self.inject_region(self.client.describe_addresses(Filters=filters)['Addresses'])
+            return self.inject_client_vars(self.client.describe_addresses(Filters=filters)['Addresses'])
         else:
             raise Exception('Invalid filter key. Allowed filters: ' + str(self.address_filters.keys()))
 
@@ -286,7 +282,7 @@ class Ec2Service(AwsBase):
         Returns:
             List of dictionaries with all VPCs
         '''
-        return self.inject_region(self.client.describe_vpcs()['Vpcs'])
+        return self.inject_client_vars(self.client.describe_vpcs()['Vpcs'])
 
     def __init__(self):
         AwsBase.__init__(self, 'ec2')

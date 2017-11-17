@@ -9,7 +9,9 @@ class AwsBase:
     access_key = None
     secret_key = None
 
-    def set_auth_config(self, service, region, access_key=None, secret_key=None, profile=None):
+
+
+    def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
         Set properties like service, region or auth method to be used by boto3 client
         Args:
@@ -36,8 +38,7 @@ class AwsBase:
             AwsBase.secret_key = secret_key
 
 
-
-    def set_client(self, service, region, access_key=None, secret_key=None, profile=None):
+    def set_client(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
         Main method to set Boto3 client.
         Args:
@@ -61,7 +62,7 @@ class AwsBase:
             self.client = boto3.client(service, region_name=AwsBase.region)
 
 
-    def inject_region(self, elements):
+    def inject_client_vars(self, elements):
         results = []
         for element in elements:
             element['RegionName'] = AwsBase.region
@@ -74,6 +75,11 @@ class AwsBase:
             results.append(element)
         return results
 
+
+
+    # #################################
+    # ------------ ACCOUNTS -----------
+    # #################################
 
     def get_accounts(self):
         '''
@@ -93,6 +99,47 @@ class AwsBase:
         AwsBase.profile = account
         self.set_client(self.service, region=AwsBase.region, profile=AwsBase.profile)
 
+    def parse_accounts(self, accounts=[]):
+        '''
+        Parse strings or list of strings to dictionary with accounts.
+
+        Args:
+            accounts: List of regions to parse
+
+        Returns:
+            A list of accounts.
+        '''
+        results = list()
+        if isinstance(accounts, str):
+            if accounts == 'ALL':
+                return self.get_accounts()
+            else:
+                return [accounts]
+
+        if isinstance(accounts, list) and len(accounts) > 0:
+            return accounts
+        else:
+            return [self.profile]
+
+
+
+    # #################################
+    # ------------ REGIONS ------------
+    # #################################
+
+    def get_regions(self):
+        '''
+        Get all available regions
+
+        Returns:
+            regions (dict): List of regions with 'Endpoint' & 'RegionName'.
+        '''
+        curService = self.service
+        self.set_client('ec2', AwsBase.region)
+        regions = self.client.describe_regions()['Regions']
+        self.set_client(curService, AwsBase.region)
+        return regions
+
 
     def change_region(self, region):
         '''
@@ -102,6 +149,31 @@ class AwsBase:
         '''
         AwsBase.region = region
         self.set_client(self.service, region=AwsBase.region)
+
+    def parse_regions(self, regions=[], default_all=False):
+        '''
+        Parse strings or list of strings to dictionary with region format.
+
+        Args:
+            regions: List of regions to parse
+            default_all: True to return all regions if region param is empty
+
+        Returns:
+            A list of formatted regions.
+        '''
+        results = list()
+        if isinstance(regions, str):
+            results = [{'RegionName':regions}]
+
+        elif isinstance(regions, list) and len(regions) > 0:
+            if isinstance(regions[0], dict): return regions
+            for region in regions:
+                results.append({'RegionName': region})
+        else:
+            results = self.get_regions() if default_all else [{'RegionName': AwsBase.region}]
+        return results
+
+
 
     def __init__(self, service):
         self.set_client(service=service,

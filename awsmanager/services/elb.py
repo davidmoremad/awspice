@@ -3,29 +3,21 @@ from base import AwsBase
 
 class ElbService(AwsBase):
 
-    def get_elbs(self):
+    def get_elbs(self, region_switch=False):
         '''
         Get all Elastic Load Balancers for a region
 
         Returns:
             List of arrays with all ELBs
         '''
-        return self.client.describe_load_balancers()['LoadBalancerDescriptions']
+        results = list()
+        regions = self.get_regions() if region_switch else [{'RegionName': AwsBase.region}]
+        for region in regions:
+            self.change_region(region['RegionName'])
+            elbs = self.client.describe_load_balancers()['LoadBalancerDescriptions']
+            results.extend(self.inject_client_vars(elbs))
 
-    def get_all_elbs(self):
-        '''
-        Get all Elastic Load Balancers for all regions
-
-        Returns:
-            List of arrays with all ELBs.
-        '''
-        elb_list = []
-        for region in self.get_regions():
-            self.set_client('elb', region['RegionName'])
-            for elb in self.get_elbs():
-                elb_list.append(elb)
-
-        return elb_list
+        return results
 
     def __init__(self):
         AwsBase.__init__(self, 'elb')

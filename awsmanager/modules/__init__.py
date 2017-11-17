@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from find_elements import ModuleFindElements
+from finder import ModuleFinder
 from common import ModuleCommon
+from security import ModuleSecurity
+from stats import ModuleStats

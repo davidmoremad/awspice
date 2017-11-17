@@ -10,7 +10,7 @@ class AcmService(AwsBase):
         Returns:
             List of arrays with all certificates
         '''
-        return self.inject_region(self.client.list_certificates()['CertificateSummaryList'])
+        return self.inject_client_vars(self.client.list_certificates()['CertificateSummaryList'])
 
     def __init__(self):
         AwsBase.__init__(self, 'acm')
