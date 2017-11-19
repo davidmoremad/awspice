@@ -124,7 +124,7 @@ class Ec2Service(AwsBase):
         Returns:
             List of dictionaries with all volumes
         '''
-        return self._extract_volumes(region_switch=region_switch)
+        return self._extract_volumes(regions=regions)
 
     def get_volume_by(self, filter_key, filter_value, regions=[]):
         return self.get_volumes_by(filter_key, filter_value, regions, return_first=True)

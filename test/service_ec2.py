@@ -18,12 +18,12 @@ class ServiceEc2TestCase(unittest.TestCase):
 
     def test_get_instance_by(self):
         aws = AwsManager('eu-west-2')
-        instance = aws.service.ec2.get_instance_by('id', 'i-541f08dc', region_switch=True)
+        instance = aws.service.ec2.get_instance_by('id', 'i-541f08dc', regions=['eu-west-1','eu-west-2'])
         self.assertEquals(instance['State']['Name'], 'running')
 
     def test_get_instances_by(self):
         aws = AwsManager('eu-west-1')
-        instances = aws.service.ec2.get_instances_by('status', 'running', region_switch=False)
+        instances = aws.service.ec2.get_instances_by('status', 'running', regions=['eu-west-1','eu-west-2'])
         for instance in instances:
             self.assertEquals(instance['State']['Name'], 'running')
 
