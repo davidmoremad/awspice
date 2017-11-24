@@ -24,7 +24,7 @@ class ModuleCommon():
             return None
 
         ######## Search ELB in AWS #######
-        regions = self.aws.ec2.parse_regions(regions)
+        regions = self.aws.ec2.parse_regions(regions, default_all=True)
         for region in regions:
             self.aws.ec2.change_region(region['RegionName'])
             elb = [elb for elb in self.aws.elb.get_elbs() if elb['DNSName'].lower() == cname.lower()]
