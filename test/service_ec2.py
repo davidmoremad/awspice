@@ -1,4 +1,5 @@
 import unittest
+import random
 from awsmanager import AwsManager, ClsEncoder
 
 class ServiceEc2TestCase(unittest.TestCase):
@@ -27,6 +28,11 @@ class ServiceEc2TestCase(unittest.TestCase):
         for instance in instances:
             self.assertEquals(instance['State']['Name'], 'running')
 
+    def test_set_tag(self):
+        aws = AwsManager('eu-west-1')
+        rnd = random.choice('abcdefghij')
+        results = aws.service.ec2.set_tag(['i-056811c5f5e5fff57'], 'Test', 'david_amrani' + rnd , regions=['eu-west-1', 'eu-central-1'])
+
 
     #################################
     # ---------- VOLUMES ---------- #
@@ -49,6 +55,23 @@ class ServiceEc2TestCase(unittest.TestCase):
         aws = AwsManager('eu-west-1')
         volume = aws.service.ec2.get_volume_by('status', 'in-use')
         self.assertTrue('i-' in volume['Attachments'][0]['InstanceId'])
+
+
+
+    # #################################
+    # ----------- ADDRESSES -----------
+    # #################################
+
+    def test_get_addresses(self):
+        aws = AwsManager('eu-west-1')
+        addresses = aws.service.ec2.get_addresses(regions=['eu-west-1'])
+        addresses = filter(lambda x: x.get('AssociationId') != None, addresses)
+        self.assertTrue(len(addresses) > 20)
+
+    def test_get_address_by(self):
+        aws = AwsManager('eu-west-1')
+        address = aws.service.ec2.get_address_by('privateip', '172.22.2.119', regions=['eu-west-1'])
+        self.assertTrue(address['PublicIp'], '52.214.252.60')
 
 
 

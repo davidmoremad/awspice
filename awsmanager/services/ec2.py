@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from base import AwsBase
+from botocore.exceptions import ClientError
 
 class Ec2Service(AwsBase):
 
@@ -31,7 +32,32 @@ class Ec2Service(AwsBase):
 
     address_filters = {
         'publicip': 'public-ip',
+        'privateip': 'private-ip-address'
     }
+
+
+    # #################################
+    # -----------  COMMON  -----------
+    # #################################
+
+    def set_tag(self, resource_id, tag_key, tag_value, regions=[]):
+        '''
+        Set tag for an instance
+
+        Args:
+            elements_id: Element that will receive the change of label.
+            tag_key: Name of the element TAG (i.e: Name).
+            tag_value: Value of that Tag.
+        '''
+        regions = self.parse_regions(regions)
+        for region in regions:
+            self.change_region(region['RegionName'])
+            try:
+                self.client.create_tags(Resources=resource_id, Tags=[{'Key': tag_key, 'Value': tag_value}])
+                return None
+            except ClientError as e:
+                pass
+        raise Exception('The element {} does not exist for that regions.'.format(resource_id))
 
 
 
@@ -143,7 +169,6 @@ class Ec2Service(AwsBase):
 
 
 
-
     # #################################
     # ------------ SNAPSHOTS ------------
     # #################################
@@ -241,21 +266,35 @@ class Ec2Service(AwsBase):
 
 
     # #################################
-    # ------------ ADDRESSES ------------
+    # ----------- ADDRESSES -----------
     # #################################
 
-    def get_addresses(self):
+    def _extract_addresses(self, filters=[], regions=[], return_first=False):
+        results = list()
+
+        regions = self.parse_regions(regions)
+        for region in regions:
+            self.change_region(region['RegionName'])
+
+            addresses = self.client.describe_addresses(Filters=filters)['Addresses']
+            addresses = self.inject_client_vars(addresses)
+            if return_first and len(addresses) > 0: return addresses[0]
+            results.extend(addresses)
+
+        return results
+
+    def get_addresses(self, regions=[]):
         '''
         Get all IP Addresses for a region
 
         Returns:
             list of dictionaries with all addresses
         '''
-        return self.inject_client_vars(self.client.describe_addresses()['Addresses'])
+        return self._extract_addresses(regions=regions)
 
-    def get_addresses_by(self, filter_key, filter_value):
+    def get_address_by(self, filter_key, filter_value, regions=[]):
         '''
-        Get all IP Addresses for a region
+        Get IP Addresses for a region that matches with filters
 
         Returns:
             list of dictionaries with all addresses
@@ -265,7 +304,7 @@ class Ec2Service(AwsBase):
                 'Name': self.address_filters[filter_key],
                 'Values': [filter_value]
             }]
-            return self.inject_client_vars(self.client.describe_addresses(Filters=filters)['Addresses'])
+            return self._extract_addresses(filters=filters, regions=regions, return_first=True)
         else:
             raise Exception('Invalid filter key. Allowed filters: ' + str(self.address_filters.keys()))
 
@@ -283,6 +322,8 @@ class Ec2Service(AwsBase):
             List of dictionaries with all VPCs
         '''
         return self.inject_client_vars(self.client.describe_vpcs()['Vpcs'])
+
+
 
     def __init__(self):
         AwsBase.__init__(self, 'ec2')
