@@ -1,18 +1,19 @@
-AWSManager 2.0
+AWSManager 1.1
 ============
 
 AWSManager is a wrapper tool of Boto3 library to list inventory of your AWS infrastructure
 
-- [AWSManager 2.0](#awsmanager-10)
-  * [What is?](#what-is-)
-  * [Installation](#installation)
-  * [Usage](#usage)
-    + [Authentication](#authentication)
-    + [Getting service data](#getting-service-data)
-    + [Highlevel functions](#highlevel-functions)
-    + [Using boto3 client](#use-boto3-client)
-  * [FAQs](#faqs)
-    + [TypeError: datetime is not JSON serializable](#typeerror--datetime-is-not-json-serializable)
+- [What is?](#what-is)
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Authentication](#authentication)
+  * [Getting service data](#getting-service-data)
+  * [Highlevel functions](#highlevel-functions)
+  * [Using boto3 client](#use-boto3-client)
+- [FAQs](#faqs)
+  * [TypeError: datetime is not JSON serializable](#typeerror--datetime-is-not-json-serializable)
+
+<br><br>
 
 What is?
 --------
@@ -23,6 +24,8 @@ to dig through all the data of our account. This allows us for example:
 -   Search for a specific instance in all accounts and regions.
 -   Filter important services exposed to internet (ssh, rdp).
 -   Save costs by finding unused IPs, unattached volumes or ELB without instances.
+
+<br><br>
 
 Installation
 ------------
@@ -40,6 +43,8 @@ git clone https://github.com/davidmoremad/awsmanager.git#egg=awsmanager
 cd awsmanager
 pip install -r requirements.txt
 ```
+
+<br><br>
 
 Usage
 ------
@@ -61,16 +66,33 @@ awsmanager = AwsManager(region='eu-west-1', profile="it_account07")
 awsmanager = AwsManager(region='eu-west-1', access_key="XXXXXXXXX", secret_key="YYYYYYYYYYY")
 ```
 
+<br><br>
+
 ### Getting service data
 
 ``` {.sourceCode .python}
-ec2s = awsmanager.service.s3.get_all_instances()     # Get all instances of all regions
-vols = awsmanager.service.ec2.get_volumes_by('status', 'available')
+ec2s = awsmanager.service.s3.get_instances()
+vols = awsmanager.service.ec2.get_volumes()
 adds = awsmanager.service.ec2.get_addresses()
 elbs = awsmanager.service.elb.get_elbs()
 rdss = awsmanager.service.rds.get_rdss()
+acms = awsmanager.service.s3.list_certificates()
 s3s  = awsmanager.service.s3.get_buckets()
+
 ```
+
+You can find items from Amazon Web Services without knowing what region they are in, and without knowing what identifier they have.
+It can also help you obtain statistics by listing all stopped instances or all detached volumes.
+
+```
+instances_ireland = awsmanager.service.s3.get_instances(regions=['eu-west-1'])
+
+instances = awsmanager.service.ec2.get_volumes_by('tagname', 'dev-*')
+volumes = awsmanager.service.ec2.get_volumes_by('status', 'available')
+certificate = awsmanager.service.s3.get_certificates('domain', 'mydomain.com')
+```
+
+<br><br>
 
 ### Highlevel functions
 
@@ -101,6 +123,7 @@ awsmanager = AwsManager('eu-west-1')
 instance_status = awsmanager.service.ec2.client.describe_instance_status(InstanceIds=['i-1234567890'])
 ```
 
+<br><br>
 
 FAQs
 ----
