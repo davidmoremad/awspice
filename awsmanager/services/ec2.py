@@ -45,9 +45,13 @@ class Ec2Service(AwsBase):
         Set tag for an instance
 
         Args:
-            elements_id: Element that will receive the change of label.
-            tag_key: Name of the element TAG (i.e: Name).
-            tag_value: Value of that Tag.
+            elements_id (str): Element that will receive the change of label. (i-0123456890, vol-123456...)
+            tag_key (str): Name of the element TAG (i.e: Name)
+            tag_value (str): Value of that Tag
+            regions (list): Regions where to look for this element
+
+        Return:
+            None
         '''
         regions = self.parse_regions(regions)
         for region in regions:
@@ -82,39 +86,44 @@ class Ec2Service(AwsBase):
 
     def get_instances(self, regions=[]):
         '''
-        Get all instances for a region
+        Get all instances for one or more regions.
+
+        Args:
+            regions (list): Regions where to look for this element
 
         Returns:
-            List of dictionaries with all instances
+            Instances (list): List of dictionaries with the instances requested
         '''
         return self._extract_instances(regions=regions)
 
     def get_instance_by(self, filter_key, filter_value, regions=[]):
         '''
-        Get an instance for a region that matches with filter
+        Get an instance for one or more regions that matches with filter
 
         Args:
             filter_key (str): Name of the filter
             filter_value (str): Value of the filter
+            regions (list): Regions where to look for this element
 
         Return:
-            Instance that matches with filters
+            Instance (dict): Dictionary with the instance requested
         '''
         return self.get_instances_by(filter_key, filter_value, regions, return_first=True)
 
     def get_instances_by(self, filter_key, filter_value, regions=[], return_first=False):
         '''
-        Get all instances for a region using filters
+        Get an instance for one or more regions that matches with filter
 
         Args:
             filter_key (str): Name of the filter
             filter_value (str): Value of the filter
+            regions (list): Regions where to look for this element
+            return_first (bool): Select to return the first match
 
         Return:
-            List of dictionaries with all instances that matches
+            Instances (list): List of dictionaries with the instances requested
         '''
-        if filter_key not in self.instance_filters:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
+        self.validate_filters(filter_key, self.instance_filters)
 
         filters = [{
             'Name': self.instance_filters[filter_key],
@@ -145,20 +154,30 @@ class Ec2Service(AwsBase):
 
     def get_volumes(self, regions=[]):
         '''
-        Get all volumes for a region
+        Get all volumes for one or more regions
+
+        Args:
+            regions (list): Regions where to look for this element
 
         Returns:
-            List of dictionaries with all volumes
+            Volumes (list): List of dictionaries with the volumes requested
         '''
         return self._extract_volumes(regions=regions)
 
     def get_volume_by(self, filter_key, filter_value, regions=[]):
+        '''
+        Get a volumes for one or more regions
+
+        Args:
+            regions (list): Regions where to look for this element
+
+        Returns:
+            Volume (dict): Dictionary with the volume requested
+        '''
         return self.get_volumes_by(filter_key, filter_value, regions, return_first=True)
 
     def get_volumes_by(self, filter_key, filter_value, regions=[], return_first=False):
-
-        if filter_key not in self.instance_filters:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.instance_filters.keys()))
+        self.validate_filters(filter_key, self.instance_filters)
 
         filters = [{
             'Name': self.volume_filters[filter_key],
@@ -175,19 +194,19 @@ class Ec2Service(AwsBase):
 
     def get_snapshots(self):
         '''
-        Get all snapshots owned by self for a region
+        Get all snapshots owned by self for the current region
 
         Returns:
-            List of dictionaries with snapshots
+            Snapshots (list): List of dictionaries with the snapshots requested
         '''
         return self.inject_client_vars(self.client.describe_snapshots(OwnerIds=['self'])['Snapshots'])
 
     def get_snapshot_by(self, filter_key, filter_value):
         '''
-        Get a snapshot for a region using filters
+        Get a snapshot for a region tha matches with filters
 
         Returns:
-            Dictionary with snapshot that matches
+            Snapshot (dict): Dictionary with the snapshot requested
         '''
         snapshots = self.get_snapshots_by(filter_key, filter_value)
         if snapshots and len(snapshots) > 0:
@@ -197,19 +216,18 @@ class Ec2Service(AwsBase):
 
     def get_snapshots_by(self, filter_key, filter_value):
         '''
-        Get all snapshots for a region using filters
+        Get all snapshots for the current region that matches with filters
 
         Returns:
-            List of dictionaries with snapshots that matches
+            Snapshots (list): List of dictionaries with the snapshots requested
         '''
-        if filter_key in self.snapshot_filters:
-            filters = [{
-                'Name': self.snapshot_filters[filter_key],
-                'Values': [filter_value]
-            }]
-            return self.inject_client_vars(self.client.describe_snapshots(Filters=filters)['Snapshots'])
-        else:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.snapshot_filters.keys()))
+        self.validate_filters(filter_key, self.snapshot_filters)
+
+        filters = [{
+            'Name': self.snapshot_filters[filter_key],
+            'Values': [filter_value]
+        }]
+        return self.inject_client_vars(self.client.describe_snapshots(Filters=filters)['Snapshots'])
 
 
 
@@ -219,10 +237,10 @@ class Ec2Service(AwsBase):
 
     def get_secgroups(self):
         '''
-        Get all security groups for a region
+        Get all security groups for the current region
 
         Returns:
-            list of dictionaries with SecurityGroups.
+            SecurityGroups (list): List of dictionaries with the security groups requested
         '''
         return self.inject_client_vars(self.client.describe_security_groups()['SecurityGroups'])
 
@@ -235,7 +253,7 @@ class Ec2Service(AwsBase):
             filter_value (str): Value of the filter
 
         Returns:
-            First Security group that matches with filters
+            SecurityGroup (dict): Dictionaries with the security group requested
         '''
         result = self.get_secgroups_by(filter_key, filter_value)
         if len(result) > 0:
@@ -252,16 +270,15 @@ class Ec2Service(AwsBase):
             filter_value (str): Value of the filter
 
         Returns:
-            All Security group that matches with filters
+            SecurityGroups (list): List of dictionaries with the security groups requested
         '''
-        if filter_key in self.secgroup_filters:
-            filters = [{
-                'Name': self.secgroup_filters[filter_key],
-                'Values': [filter_value]
-            }]
-            return self.inject_client_vars(self.client.describe_security_groups(Filters=filters)['SecurityGroups'])
-        else:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.secgroup_filters.keys()))
+        self.validate_filters(filter_key, self.secgroup_filters)
+        filters = [{
+            'Name': self.secgroup_filters[filter_key],
+            'Values': [filter_value]
+        }]
+
+        return self.inject_client_vars(self.client.describe_security_groups(Filters=filters)['SecurityGroups'])
 
 
 
@@ -287,8 +304,11 @@ class Ec2Service(AwsBase):
         '''
         Get all IP Addresses for a region
 
+        Args:
+            regions (list): Regions where to look for this element
+
         Returns:
-            list of dictionaries with all addresses
+            Addresses (dict): List of dictionaries with the addresses requested
         '''
         return self._extract_addresses(regions=regions)
 
@@ -296,17 +316,18 @@ class Ec2Service(AwsBase):
         '''
         Get IP Addresses for a region that matches with filters
 
+        Args:
+            regions (list): Regions where to look for this element
+
         Returns:
-            list of dictionaries with all addresses
+            Address (dict): Dictionary with the address requested
         '''
-        if filter_key in self.address_filters:
-            filters = [{
-                'Name': self.address_filters[filter_key],
-                'Values': [filter_value]
-            }]
-            return self._extract_addresses(filters=filters, regions=regions, return_first=True)
-        else:
-            raise Exception('Invalid filter key. Allowed filters: ' + str(self.address_filters.keys()))
+        self.validate_filters(filter_key, self.address_filters)
+        filters = [{
+            'Name': self.address_filters[filter_key],
+            'Values': [filter_value]
+        }]
+        return self._extract_addresses(filters=filters, regions=regions, return_first=True)
 
 
 
@@ -319,7 +340,7 @@ class Ec2Service(AwsBase):
         Get all VPCs for a region
 
         Returns:
-            List of dictionaries with all VPCs
+            VPCs (list): List of dictionaries with the vpcs requested
         '''
         return self.inject_client_vars(self.client.describe_vpcs()['Vpcs'])
 
