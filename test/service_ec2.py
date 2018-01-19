@@ -70,7 +70,7 @@ class ServiceEc2TestCase(unittest.TestCase):
 
     def test_get_address_by(self):
         aws = AwsManager('eu-west-1')
-        address = aws.service.ec2.get_address_by('privateip', '172.22.2.119', regions=['eu-west-1'])
+        address = aws.service.ec2.get_address_by('privateip', '172.22.1.221', regions=['eu-west-1'])
         self.assertTrue(address['PublicIp'], '52.214.252.60')
 
 

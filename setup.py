@@ -21,15 +21,15 @@ def read_file(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='awsmanager',
-    version='2.0',
+    name='awspice',
+    version='1.2',
     install_requires=read_file('requirements.txt').splitlines(),
     packages=find_packages(),
     author='David Amrani Hernandez',
     author_email='davidmorenomad@gmail.com',
-    url='https://github.com/davidmoremad',
-    description='Wrapper tool of Boto3 library to list inventory of your AWS infrastructure',
-    keywords=['aws', 'amazon', 'boto3', 'amazon web services', 'virtual machines'],
+    url='https://github.com/davidmoremad/',
+    description='Wrapper of Boto3 to work with multiple accounts, regions and elements of the AWS platform easily and quickly.',
+    keywords=['aws', 'amazon', 'boto3', 'amazon web services', 'cloud', 'platform', 'instances'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
