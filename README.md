@@ -1,4 +1,4 @@
-AWSManager 1.1
+AWSManager 1.2
 ============
 
 AWSManager is a wrapper tool of Boto3 library to list inventory of your AWS infrastructure

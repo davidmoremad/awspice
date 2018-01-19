@@ -1,2 +1,2 @@
-boto3
-dnspython
+boto3==1.5.11
+dnspython==1.15.0

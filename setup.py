@@ -22,7 +22,7 @@ def read_file(fname):
 
 setup(
     name='awspice',
-    version='1.2',
+    version=read_file('VERSION').strip(),
     install_requires=read_file('requirements.txt').splitlines(),
     packages=find_packages(),
     author='David Amrani Hernandez',
