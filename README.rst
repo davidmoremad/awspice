@@ -63,3 +63,46 @@ This test only checks that your user is registered and enabled on the AWS accoun
 
   aws = awspice.connect(profile='<YOUR_PROFILE>')
   aws.test()
+
+
+
+------------------------------------------------------------------------------------------
+
+*****
+Usage
+*****
+
+Example: Get balancer and instances behind a domain.
+
+.. code-block:: python
+
+  aws = awspice.connect()
+
+  elb = aws.service.elb.get_loadbalancer_by('domain', 'choosetravel.es')
+  for elb_instance in elb['Instances']:
+    instance = aws.service.ec2.get_instance_by('id', elb_instance['InstanceId'])
+
+
+Example: List all unused volumes
+
+.. code-block:: python
+
+  regions = aws.service.ec2.get_regions()
+  volumes = awsmanager.service.ec2.get_volumes_by('status', 'available', regions=regions)
+
+
+Example: Search instance in all accounts and regions by Public IP
+
+.. code-block:: python
+
+  profiles = aws.service.ec2.get_profiles()
+  regions = aws.service.ec2.get_regions()
+
+  for profile in profiles:
+      aws.service.ec2.change_profile(profile)
+
+      instance = aws.service.ec2.get_instance_by('publicip', '35.158.163.235', regions=regions)
+
+      if instance:
+          print 'Instance found: %s (Account: %s, Region: %s)' % (instance['InstanceId'], instance['RegionName'], instance['Authorization']['Value'])
+          break
