@@ -25,54 +25,54 @@ class ServiceBaseTestCase(unittest.TestCase):
 
 
     ####################################
-    # ~~~~~~~~~~~  ACCOUNTS ~~~~~~~~~~ #
+    # ~~~~~~~~~~~  PROFILES ~~~~~~~~~~ #
     ####################################
 
-    def test_get_accounts(self):
+    def test_get_profiles(self):
         aws = AwsManager('eu-west-1')
-        accounts = sorted(aws.service.ec2.get_accounts())
+        profiles = sorted(aws.service.ec2.get_profiles())
 
-        # GET Accounts from file
+        # GET profiles from file
         with open(expanduser("~") + "/.aws/credentials", 'r') as myfile:
             data = myfile.read().replace('\n', '')
         regex = re.compile(r'\[(?P<name>\w*)\]')
         credentials = sorted(regex.findall(data))
 
-        self.assertEquals(accounts, credentials)
+        self.assertEquals(profiles, credentials)
 
-    def test_change_account(self):
+    def test_change_profile(self):
         aws = AwsManager('eu-west-1')
-        for account in ['default', 'qa']:
-            aws.service.ec2.change_account(account)
+        for profile in ['default', 'qa']:
+            aws.service.ec2.change_profile(profile)
             profile = aws.service.get_auth_config()
-            self.assertEquals(profile['Authorization']['Value'], account)
+            self.assertEquals(profile['Authorization']['Value'], profile)
 
-    def test_parse_accounts_empty(self):
+    def test_parse_profiles_empty(self):
         aws = AwsManager('eu-west-1', profile='qa')
-        accounts = aws.service.ec2.parse_accounts([])
-        self.assertEquals(accounts, ['qa'])
+        profiles = aws.service.ec2.parse_profiles([])
+        self.assertEquals(profiles, ['qa'])
 
-    def test_parse_accounts_list(self):
+    def test_parse_profiles_list(self):
         aws = AwsManager('eu-west-1', profile='qa')
-        accounts = aws.service.ec2.parse_accounts(['qa', 'test'])
-        self.assertEquals(accounts, ['qa', 'test'])
+        profiles = aws.service.ec2.parse_profiles(['qa', 'test'])
+        self.assertEquals(profiles, ['qa', 'test'])
 
-    def test_parse_accounts_string(self):
+    def test_parse_profiles_string(self):
         aws = AwsManager('eu-west-1', profile='qa')
-        accounts = aws.service.ec2.parse_accounts('test_str')
-        self.assertEquals(accounts, ['test_str'])
+        profiles = aws.service.ec2.parse_profiles('test_str')
+        self.assertEquals(profiles, ['test_str'])
 
-    def test_parse_accounts_string_ALL_hack(self):
+    def test_parse_profiles_string_ALL_hack(self):
         aws = AwsManager('eu-west-1', profile='qa')
-        accounts = sorted(aws.service.ec2.parse_accounts('ALL'))
+        profiles = sorted(aws.service.ec2.parse_profiles('ALL'))
 
-        # GET Accounts from file
+        # GET profiles from file
         with open(expanduser("~") + "/.aws/credentials", 'r') as myfile:
             data = myfile.read().replace('\n', '')
         regex = re.compile(r'\[(?P<name>\w*)\]')
         credentials = sorted(regex.findall(data))
 
-        self.assertEquals(accounts, credentials)
+        self.assertEquals(profiles, credentials)
 
 
 

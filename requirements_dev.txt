@@ -5,3 +5,4 @@ dnspython==1.15.0
 Sphinx==1.4
 pytest==2.9.2
 sphinx_rtd_theme
+sphinxcontrib.napoleon
