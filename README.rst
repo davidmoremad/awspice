@@ -6,6 +6,15 @@ Awspice
   :alt: Documentation Status
 
 
+  
+Table of content (Full doc in `ReadhTheDocs <http://awspice.readthedocs.io/en/latest/>`_) :
+
+* `Installation <#installation>`_
+* `Configuration <#configuration>`_
+* `Test <#test>`_
+* `Usage <#usage>`_
+
+
 ****************
 What is Awspice?
 ****************
@@ -21,6 +30,8 @@ and for example you will be able of:
 
 ------------------------------------------------------------------------------------------
 
+.. installation-section
+
 ************
 Installation
 ************
@@ -30,6 +41,8 @@ Installation
   pip install git+https://github.com/davidmoremad/awsmanager.git@<VERSION>
 
 ------------------------------------------------------------------------------------------
+
+.. configuration-section
 
 *************
 Configuration
@@ -50,6 +63,8 @@ The client is built and configured using ``awspice.connect()``. This method indi
 
 ------------------------------------------------------------------------------------------
 
+.. test-section
+
 *******
 Test it
 *******
@@ -68,11 +83,13 @@ This test only checks that your user is registered and enabled on the AWS accoun
 
 ------------------------------------------------------------------------------------------
 
+.. usage-section
+
 *****
 Usage
 *****
 
-Example: Get balancer and instances behind a domain.
+**Example**: Get balancer and instances behind a domain.
 
 .. code-block:: python
 
@@ -83,7 +100,7 @@ Example: Get balancer and instances behind a domain.
     instance = aws.service.ec2.get_instance_by('id', elb_instance['InstanceId'])
 
 
-Example: List all unused volumes
+**Example**: List all unused volumes
 
 .. code-block:: python
 
@@ -91,7 +108,7 @@ Example: List all unused volumes
   volumes = awsmanager.service.ec2.get_volumes_by('status', 'available', regions=regions)
 
 
-Example: Search instance in all accounts and regions by Public IP
+**Example**: Search instance in all accounts and regions by Public IP
 
 .. code-block:: python
 
