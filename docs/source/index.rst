@@ -24,10 +24,36 @@ Welcome to awspice's documentation!
   Awspice Module <modules.rst>
 
 
+.. intro-section
+
+.. image:: https://readthedocs.org/projects/awsmanager/badge/?version=latest
+  :target: http://awsmanager.readthedocs.io/en/latest/?badge=latest
+  :alt: Documentation Status
+
+
+****************
+What is Awspice?
+****************
+
+Is a wrapper tool of Boto3 library to list inventory and manage your AWS infrastructure
+The objective of the wrapper is to abstract the use of AWS, being able to dig through all the data of our account,
+and for example you will be able of:
+
+* Run a ssh-command for all instances in all regions
+* List all instances with exposed critical ports like 22 or 3389
+* Get info about all certificates of your account/s
+* Obtain all the infrastructure after a domain associated with a balancer
+
+------------------------------------------------------------------------------------------
+
 .. include:: getting_started.rst
   :start-after: installation-section
   :end-before: configuration-section
 
+
+
+
+.. configuration-section
 
 *************
 Configuration
@@ -45,8 +71,6 @@ The client is built and configured using ``awspice.connect()``. This method indi
   aws = awspice.connect(region='us-west-2', profile='dev_profile')
   aws = awspice.connect('us-west-2', access_key='AKIA***********', secret_key='/HR$4************')
 
-
-`Read more <getting_started.html>`_
 
 ------------------------------------------------------------------------------------------
 
