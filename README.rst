@@ -1,8 +1,8 @@
 Awspice
 =======
 
-.. image:: https://readthedocs.org/projects/awsmanager/badge/?version=latest
-  :target: http://awsmanager.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/awspice/badge/?version=latest
+  :target: http://awspice.readthedocs.io/en/latest/?badge=latest
   :alt: Documentation Status
 
 
