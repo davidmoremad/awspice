@@ -28,9 +28,9 @@ class ModuleStats():
             # data['Snapshots'] = self.aws.ec2.get_snapshots();  # Need to select only private snaps
             data['Addresses'] = self.aws.ec2.get_addresses();
             data['Vpcs'] = self.aws.ec2.get_vpcs();
-            data['LoadBalancers'] = self.aws.elb.get_elbs();
+            data['LoadBalancers'] = self.aws.elb.get_loadbalancers();
             data['Databases'] = self.aws.rds.get_rdss();
-            data['Certificates'] = self.aws.acm.get_certificates();
+            data['Certificates'] = self.aws.acm.list_certificates();
             results['Regions'][region['RegionName']] = data
         return results
 
@@ -54,7 +54,7 @@ class ModuleStats():
             savings['Volumes'] = self.aws.ec2.get_volumes_by('status', 'available')
             adds = self.aws.ec2.get_addresses()
             savings['Addresses'] = filter(lambda x: x.get('AssociationId') == None, adds)
-            elbs = self.aws.elb.get_elbs()
+            elbs = self.aws.elb.get_loadbalancers()
             savings['LoadBalancers'] = filter(lambda x: x.get('Instances') == [], elbs)
 
             results[region['RegionName']] = savings
