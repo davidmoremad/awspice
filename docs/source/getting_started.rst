@@ -31,7 +31,7 @@ Installation
 
 .. code-block:: bash
 
-  pip install git+https://github.com/davidmoremad/awsmanager.git@<VERSION>
+  pip install awspice
 
 
 ------------------------------------------------------------------------------------------
@@ -87,3 +87,24 @@ This test only checks that your user is registered and enabled on the AWS accoun
 
   aws = awspice.connect(profile='<YOUR_PROFILE>')
   aws.test()
+
+
+------------------------------------------------------------------------------------------
+
+.. boto3-section
+
+******************
+Using boto3 client
+******************
+
+If you want to use the native Boto3 client to perform some operation, you can also do it using the "client" attribute within each service.
+If you call the client through the class *ec2*, this will be the service on which the client will be configured.
+The region and authentication will be the same as the last call made.
+
+
+.. code-block:: python
+
+  import awspice
+
+  aws = awspice.connect(region='us-east-1', profile='sample')
+  aws.service.ec2.client.describe_instance_status(InstanceIds=['i-12345'])
