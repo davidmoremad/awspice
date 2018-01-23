@@ -24,11 +24,20 @@ Welcome to awspice's documentation!
   Awspice Module <modules.rst>
 
 
-.. intro-section
+.. shields-section
 
-.. image:: https://readthedocs.org/projects/awspice/badge/?version=latest
-  :target: http://awspice.readthedocs.io/en/latest/?badge=latest
-  :alt: Documentation Status
+
+|Docs| |Version|
+
+
+.. |Docs| image:: https://readthedocs.org/projects/awspice/badge/?version=latest
+   :target: http://awspice.readthedocs.io/en/latest/?badge=latest
+   :alt: Read the Docs
+.. |Version| image:: http://img.shields.io/pypi/v/awspice.svg?style=flat
+    :target: https://pypi.python.org/pypi/awspice/
+    :alt: Version
+
+.. intro-section
 
 
 ****************

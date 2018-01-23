@@ -33,7 +33,9 @@ setup(
         "Source Code": "https://github.com/davidmoremad/awspice",
     },
     description='Awspice is a wrapper tool of Boto3 library to list inventory and manage your AWS infrastructure The objective of the wrapper is to abstract the use of AWS, being able to dig through all the data of our account',
-    keywords=['aws', 'amazon', 'boto3', 'amazon web services', 'cloud', 'platform', 'instances'],
+    long_description=open('README.rst').read(),
+    keywords="aws amazon cloud platform boto3 wrapper security management region account",
+    license='Apache 2.0',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -49,5 +51,4 @@ setup(
         'Topic :: Software Development :: Quality Assurance',
         'Topic :: Software Development :: Testing',
     ],
-    license='Apache 2.0',
 )
