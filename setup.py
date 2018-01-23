@@ -28,7 +28,11 @@ setup(
     author='David Amrani Hernandez',
     author_email='davidmorenomad@gmail.com',
     url='https://github.com/davidmoremad/',
-    description='Wrapper of Boto3 to work with multiple accounts, regions and elements of the AWS platform easily and quickly.',
+    project_urls={
+        "Documentation": "https://awspice.readthedocs.io",
+        "Source Code": "https://github.com/davidmoremad/awspice",
+    }
+    description='Awspice is a wrapper tool of Boto3 library to list inventory and manage your AWS infrastructure The objective of the wrapper is to abstract the use of AWS, being able to dig through all the data of our account',
     keywords=['aws', 'amazon', 'boto3', 'amazon web services', 'cloud', 'platform', 'instances'],
     classifiers=[
         'Development Status :: 4 - Beta',
