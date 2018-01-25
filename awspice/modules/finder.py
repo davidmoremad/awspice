@@ -7,7 +7,7 @@ class ModuleFinder:
         regions = self.aws.ec2.parse_regions(regions, True)
 
         for account in profiles:
-            self.aws.ec2.change_account(account)
+            self.aws.ec2.change_profile(account)
             instance = self.aws.ec2.get_instance_by(filter_key, filter_value, regions=regions)
             if instance: return instance
         return None
@@ -18,7 +18,7 @@ class ModuleFinder:
         regions = self.aws.ec2.parse_regions(regions, True)
 
         for account in profiles:
-            self.aws.ec2.change_account(account)
+            self.aws.ec2.change_profile(account)
             results.extend(self.aws.ec2.get_instances_by(filter_key, filter_value, regions=regions))
         return results
 
@@ -27,7 +27,7 @@ class ModuleFinder:
         regions = self.aws.ec2.parse_regions(regions, True)
 
         for account in profiles:
-            self.aws.ec2.change_account(account)
+            self.aws.ec2.change_profile(account)
             regions = self.aws.ec2.parse_regions(regions, True)
             volume = self.aws.ec2.get_volume_by(filter_key, filter_value, regions=regions)
             if volume: return volume
@@ -39,7 +39,7 @@ class ModuleFinder:
         regions = self.aws.ec2.parse_regions(regions, True)
 
         for account in profiles:
-            self.aws.ec2.change_account(account)
+            self.aws.ec2.change_profile(account)
             regions = self.aws.ec2.parse_regions(regions, True)
             results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
         return results
