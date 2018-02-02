@@ -17,8 +17,9 @@ limitations under the License.
 import os
 from setuptools import setup, find_packages
 
-def read_file(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+def read_file(filename):
+    with open(filename) as f:
+        return f.read()
 
 setup(
     name='awspice',
