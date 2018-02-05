@@ -43,7 +43,7 @@ Installation
 
 .. code-block:: bash
 
-  pip install git+https://github.com/davidmoremad/awsmanager.git@<VERSION>
+  pip install awspice
 
 ------------------------------------------------------------------------------------------
 
