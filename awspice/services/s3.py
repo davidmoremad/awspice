@@ -34,11 +34,12 @@ class S3Service(AwsBase):
                         if k == 'Permission' and any(permission in v for permission in permissions_to_check):
                             for (grantee_attrib_k, grantee_attrib_v) in grant['Grantee'].iteritems():
                                 if 'URI' in grantee_attrib_k and grant['Grantee']['URI'] == public_acl_indicator:
-                                    if bucket['Name'] in public_bucket.keys():
-                                        public_bucket[bucket['Name']].append(v)
+                                    if public_bucket.get('Name'):
+                                        public_bucket['Permissions'].append(v)
                                     else:
-                                        public_bucket[bucket['Name']] = []
-                                        public_bucket[bucket['Name']].append(v)
+                                        public_bucket['Name'] = bucket['Name']
+                                        public_bucket['Permissions'] = []
+                                        public_bucket['Permissions'].append(v)
 
                 if public_bucket: results.append(public_bucket)
             except:
