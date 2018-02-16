@@ -166,9 +166,11 @@ class Ec2Service(AwsBase):
 
     def get_volume_by(self, filter_key, filter_value, regions=[]):
         '''
-        Get a volumes for one or more regions
+        Get a volume for one or more regions that matches with filters
 
         Args:
+            filter_key (str): Name of the filter
+            filter_value (str): Value of the filter
             regions (list): Regions where to look for this element
 
         Returns:
@@ -177,6 +179,17 @@ class Ec2Service(AwsBase):
         return self.get_volumes_by(filter_key, filter_value, regions, return_first=True)
 
     def get_volumes_by(self, filter_key, filter_value, regions=[], return_first=False):
+        '''
+        Get volumes for one or more regions that matches with filters
+
+        Args:
+            filter_key (str): Name of the filter
+            filter_value (str): Value of the filter
+            regions (list): Regions where to look for this element
+
+        Returns:
+            Volume (dict): Dictionary with the volume requested
+        '''
         self.validate_filters(filter_key, self.instance_filters)
 
         filters = [{
@@ -205,6 +218,10 @@ class Ec2Service(AwsBase):
         '''
         Get a snapshot for a region tha matches with filters
 
+        Args:
+            filter_key (str): Name of the filter
+            filter_value (str): Value of the filter
+
         Returns:
             Snapshot (dict): Dictionary with the snapshot requested
         '''
@@ -217,6 +234,10 @@ class Ec2Service(AwsBase):
     def get_snapshots_by(self, filter_key, filter_value):
         '''
         Get all snapshots for the current region that matches with filters
+
+        Args:
+            filter_key (str): Name of the filter
+            filter_value (str): Value of the filter
 
         Returns:
             Snapshots (list): List of dictionaries with the snapshots requested
