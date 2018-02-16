@@ -56,7 +56,7 @@ clean:
 html:
 	rm -rf $(BUILDDIR)/*
 	./generate_documentation.sh
-	sphinx-apidoc -o ./source ../awspice/
+	sphinx-apidoc -o ./source ../awspice/ -f
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html -a -E
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
