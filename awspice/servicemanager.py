@@ -28,6 +28,9 @@ class ServiceManager:
     @property
     def s3(self): return S3Service()
 
+    @property
+    def ce(self): return CostExplorerService()
+
 
 
     def get_auth_config(self):
