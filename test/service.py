@@ -1,18 +1,18 @@
 import unittest
-from awsmanager import AwsManager, ClsEncoder
+import awspice
 
-class ServiceEc2TestCase(unittest.TestCase):
+class ServiceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print("\nStarting unit tests of Service.EC2 ")
+        print("\nStarting unit tests of Service Class")
 
     #################################
     # -------- INSTANCES ---------- #
     #################################
 
     def test_get_auth_config(self):
-        aws = AwsManager('eu-west-1', profile='default')
+        aws = awspice.connect('eu-west-1', profile='default')
         self.assertEquals(aws.service.get_auth_config(), {'Authorization': {'Type':'Profile', 'Value': 'default'}})
 
 if __name__ == '__main__':

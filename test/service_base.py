@@ -1,7 +1,7 @@
 import unittest
 import re
 from os.path import expanduser
-from awsmanager import AwsManager, ClsEncoder
+import awspice
 
 class ServiceBaseTestCase(unittest.TestCase):
 
@@ -11,7 +11,7 @@ class ServiceBaseTestCase(unittest.TestCase):
 
 
     def test_inject_client_vars(self):
-        aws = AwsManager('eu-west-1', 'qa')
+        aws = awspice.connect('eu-west-1', 'qa')
 
         elements = [{'test': 1}, {'test': 2}]
         newelements = aws.service.ec2.inject_client_vars(elements)
@@ -29,7 +29,7 @@ class ServiceBaseTestCase(unittest.TestCase):
     ####################################
 
     def test_get_profiles(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         profiles = sorted(aws.service.ec2.get_profiles())
 
         # GET profiles from file
@@ -41,29 +41,29 @@ class ServiceBaseTestCase(unittest.TestCase):
         self.assertEquals(profiles, credentials)
 
     def test_change_profile(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         for profile in ['default', 'qa']:
             aws.service.ec2.change_profile(profile)
             profile = aws.service.get_auth_config()
-            self.assertEquals(profile['Authorization']['Value'], profile)
+            self.assertEquals(profile['Authorization']['Value'], profile['Authorization']['Value'])
 
     def test_parse_profiles_empty(self):
-        aws = AwsManager('eu-west-1', profile='qa')
+        aws = awspice.connect('eu-west-1', profile='qa')
         profiles = aws.service.ec2.parse_profiles([])
         self.assertEquals(profiles, ['qa'])
 
     def test_parse_profiles_list(self):
-        aws = AwsManager('eu-west-1', profile='qa')
+        aws = awspice.connect('eu-west-1', profile='qa')
         profiles = aws.service.ec2.parse_profiles(['qa', 'test'])
         self.assertEquals(profiles, ['qa', 'test'])
 
     def test_parse_profiles_string(self):
-        aws = AwsManager('eu-west-1', profile='qa')
+        aws = awspice.connect('eu-west-1', profile='qa')
         profiles = aws.service.ec2.parse_profiles('test_str')
         self.assertEquals(profiles, ['test_str'])
 
     def test_parse_profiles_string_ALL_hack(self):
-        aws = AwsManager('eu-west-1', profile='qa')
+        aws = awspice.connect('eu-west-1', profile='qa')
         profiles = sorted(aws.service.ec2.parse_profiles('ALL'))
 
         # GET profiles from file
@@ -82,7 +82,7 @@ class ServiceBaseTestCase(unittest.TestCase):
     ####################################
 
     def test_get_regions(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         regions = [ 'us-east-1',
                     'us-east-2',
                     'us-west-1',
@@ -103,7 +103,7 @@ class ServiceBaseTestCase(unittest.TestCase):
         self.assertEquals(regions, curregions)
 
     def test_change_regions(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         for region in ['eu-west-1','eu-west-2','eu-central-1']:
             aws.service.ec2.change_region(region)
             curRegion = aws.service.ec2.region
@@ -111,25 +111,25 @@ class ServiceBaseTestCase(unittest.TestCase):
 
     def test_parse_regions_empty(self):
         curRegion = 'eu-west-1'
-        aws = AwsManager(curRegion)
+        aws = awspice.connect(curRegion)
         results = sorted(aws.service.ec2.parse_regions([]))
         self.assertEquals(results[0]['RegionName'], aws.service.ec2.region)
 
     def test_parse_regions_empty_getALL(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         regionsEmpty = []
         results = sorted(aws.service.ec2.parse_regions(regionsEmpty, True))
         allRegions = sorted(aws.service.ec2.get_regions())
         self.assertEquals(results, allRegions)
 
     def test_parse_regions_string(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         regionsStr = 'eu-west-1'
         resultsStr = aws.service.ec2.parse_regions(regionsStr)
         self.assertEqual(resultsStr, [{'RegionName': 'eu-west-1'}])
 
     def test_parse_regions_list_strings(self):
-        aws = AwsManager('eu-west-1')
+        aws = awspice.connect('eu-west-1')
         regionsList = ['eu-west-1', 'eu-central-1']
         resultsList = aws.service.ec2.parse_regions(regionsList)
         self.assertIn({'RegionName':regionsList[0]}, resultsList)

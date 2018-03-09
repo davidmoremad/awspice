@@ -2,6 +2,9 @@
 from base import AwsBase
 
 class S3Service(AwsBase):
+    '''
+    Class belonging to the S3 Storage service.
+    '''
 
     def get_buckets(self):
         '''

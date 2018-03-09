@@ -2,6 +2,9 @@
 from base import AwsBase
 
 class AcmService(AwsBase):
+    '''
+    Class belonging to the ACM certificate management service.
+    '''
 
     def list_certificates(self, regions=[]):
         '''

@@ -4,6 +4,9 @@ import sys, dns.resolver
 
 
 class ElbService(AwsBase):
+    '''
+    Class belonging to the Load Balancers service.
+    '''
 
     loadbalancer_filters = {
         'domain': '',

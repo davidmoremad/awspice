@@ -12,7 +12,7 @@ class ClsEncoder(json.JSONEncoder):
     Solve it using this class encoder in ``cls`` argument
 
     Examples:
-        $ json.dumps(results, indent=4, cls=awspice.ClsEncoder)
+        json.dumps(results, indent=4, cls=awspice.ClsEncoder)
     '''
 
     def default(self, obj):
@@ -20,3 +20,26 @@ class ClsEncoder(json.JSONEncoder):
             return int(mktime(obj.timetuple()))
 
         return json.JSONEncoder.default(self, obj)
+
+class Helpers():
+    '''
+    Class with useful and more used methods.
+
+    This class contains the most used methods or some that are quite useful for certain moments,
+    for example, to get a specific JSON tag from an instance.
+
+    Examples:
+
+    '''
+
+    def read_tag(self, tag_key, element):
+        '''
+        Returns the value of a specific tag
+
+        Arguments:
+            tag_key: Name of the Key of the Tag.
+            element: Object from which you want to obtain the tag
+
+        Examples:
+            project = read_tag('Project', myvolume)
+        '''

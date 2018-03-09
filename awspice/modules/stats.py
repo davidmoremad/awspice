@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
-class ModuleStats():
+class StatsModule:
+    '''
+    Class responsible for processing general data to the AWS account.
+
+    This class is dedicated to the global management of the AWS account in order to obtain statistics, costs or global information.
+
+    Attributes:
+        aws: awspice client
+    '''
 
     def get_stats(self, regions=[]):
         '''

@@ -1,5 +1,5 @@
-boto3==1.5.11
-dnspython==1.15.0
+# Requirements
+-rrequirements.txt
 
 # Documentation
 Sphinx==1.4

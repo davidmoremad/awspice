@@ -23,15 +23,15 @@ class AwsManager:
 
     @property
     def finder(self):
-        return ModuleFinder(self.aws)
+        return FinderModule(self.aws)
 
     @property
     def security(self):
-        return ModuleSecurity(self.aws)
+        return SecurityModule(self.aws)
 
     @property
     def stats(self):
-        return ModuleStats(self.aws)
+        return StatsModule(self.aws)
 
 
     def test(self):

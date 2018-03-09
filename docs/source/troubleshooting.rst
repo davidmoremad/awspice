@@ -4,6 +4,41 @@
 FAQs & Troubleshooting
 ======================
 
+**************************
+Frequently Asked Questions
+**************************
+
+
+Running Tests
+---------------
+
+At the moment this functionality is not available as they have not been mocked.
+
+.. code-block:: bash
+
+  $ pip install -r requirements.txt
+  $ python -m unittest -v test
+
+
+
+Generating Documentation
+------------------------
+
+Sphinx is used for documentation. You can generate HTML locally with the following:
+
+
+.. code-block:: bash
+
+  $ pip install -r requirements_dev.txt
+  $ cd docs
+  $ make html
+
+
+
+***************
+Troubleshooting
+***************
+
 
 TypeError: datetime is not JSON serializable
 --------------------------------------------

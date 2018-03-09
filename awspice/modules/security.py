@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
-from . import ModuleFinder
+from . import FinderModule
 
-class ModuleSecurity():
+class SecurityModule:
+    '''
+    This class facilitates methods for securing the AWS account
+
+    Methods are available to help improve AWS account security by detecting bad configurations.
+    '''
 
     def get_instance_portlisting(self, aws, instanceid):
         '''

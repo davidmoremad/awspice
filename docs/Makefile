@@ -55,7 +55,8 @@ clean:
 .PHONY: html
 html:
 	rm -rf $(BUILDDIR)/*
-	./generate_documentation.sh
+	@echo "Generating documentation..."
+	./scripts/generate_documentation.sh
 	sphinx-apidoc -o ./source ../awspice/ -f
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html -a -E
 	@echo

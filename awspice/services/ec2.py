@@ -3,6 +3,9 @@ from base import AwsBase
 from botocore.exceptions import ClientError
 
 class Ec2Service(AwsBase):
+    '''
+    Class belonging to the EC2 Computing service.
+    '''
 
     instance_filters = {
         'id': 'instance-id',
@@ -227,7 +230,7 @@ class Ec2Service(AwsBase):
         '''
         snapshots = self.get_snapshots_by(filter_key, filter_value)
         if snapshots and len(snapshots) > 0:
-            return snapshots[0]
+            return self.inject_client_vars(snapshots)[0]
         else:
             return None
 
@@ -276,9 +279,9 @@ class Ec2Service(AwsBase):
         Returns:
             SecurityGroup (dict): Dictionaries with the security group requested
         '''
-        result = self.get_secgroups_by(filter_key, filter_value)
-        if len(result) > 0:
-            return result[0]
+        secgroup = self.get_secgroups_by(filter_key, filter_value)
+        if len(secgroup) > 0:
+            return self.inject_client_vars(secgroup)[0]
         else:
             return None
 
@@ -364,7 +367,6 @@ class Ec2Service(AwsBase):
             VPCs (list): List of dictionaries with the vpcs requested
         '''
         return self.inject_client_vars(self.client.describe_vpcs()['Vpcs'])
-
 
 
     def __init__(self):

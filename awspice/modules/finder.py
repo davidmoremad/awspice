@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
 
-class ModuleFinder:
+class FinderModule:
+    '''
+    This class makes it easy to search for components in AWS.
+
+    Attributes:
+        aws: awspice client
+
+    '''
 
     def find_instance(self, filter_key, filter_value, profiles=[], regions=[]):
+        '''
+        Searches for an instance in different accounts and regions, using search filters.
+        '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
 
@@ -13,6 +23,9 @@ class ModuleFinder:
         return None
 
     def find_instances(self, filter_key, filter_value, profiles=[], regions=[]):
+        '''
+        Searches for a group of instances in different accounts and regions, using search filters.
+        '''
         results = list()
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
@@ -23,6 +36,9 @@ class ModuleFinder:
         return results
 
     def find_volume(self, filter_key, filter_value, profiles=[], regions=[]):
+        '''
+        Searches for an volume in different accounts and regions, using search filters.
+        '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
 
@@ -34,6 +50,9 @@ class ModuleFinder:
         return None
 
     def find_volumes(self, filter_key, filter_value, profiles=[], regions=[]):
+        '''
+        Searches for a group of volumes in different accounts and regions, using search filters.
+        '''
         results = list()
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)

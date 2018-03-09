@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 u"""
-Copyright 2017 David Amrani Hernandez
+Copyright 2018 David Amrani Hernandez
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
 import os
 from setuptools import setup, find_packages
 
@@ -28,7 +29,7 @@ setup(
     packages=find_packages(),
     author='David Amrani Hernandez',
     author_email='davidmorenomad@gmail.com',
-    url='https://github.com/davidmoremad/',
+    url='https://github.com/davidmoremad',
     project_urls={
         "Documentation": "https://awspice.readthedocs.io",
         "Source Code": "https://github.com/davidmoremad/awspice",

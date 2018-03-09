@@ -13,7 +13,8 @@ Welcome to awspice's documentation!
   :caption: Contents:
 
   Getting started <getting_started.rst>
-  Services <services.rst>
+  Services <awspice-services.rst>
+  Modules <awspice-modules.rst>
   FAQs & Troubleshooting <troubleshooting.rst>
 
 .. toctree::

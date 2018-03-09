@@ -5,7 +5,7 @@ Services
 
 
 
-ACM
+Acm
 ---
 
 .. autosummary::
@@ -16,7 +16,16 @@ ACM
 
 
 
-EC2
+CostExplorer
+------------
+
+.. autosummary::
+
+   awspice.services.ce.CostExplorerService.get_cost
+
+
+
+Ec2
 ---
 
 .. autosummary::
@@ -40,7 +49,7 @@ EC2
 
 
 
-ELB
+Elb
 ---
 
 .. autosummary::
@@ -50,7 +59,7 @@ ELB
 
 
 
-IAM
+Iam
 ---
 
 .. autosummary::
@@ -59,7 +68,7 @@ IAM
 
 
 
-RDS
+Rds
 ---
 
 .. autosummary::

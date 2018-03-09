@@ -2,6 +2,9 @@
 from base import AwsBase
 
 class IamService(AwsBase):
+    '''
+    Class belonging to the IAM Identity & Access management service.
+    '''
 
     def get_users(self):
         '''

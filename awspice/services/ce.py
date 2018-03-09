@@ -3,17 +3,19 @@ from base import AwsBase
 import datetime
 
 class CostExplorerService(AwsBase):
-
+    '''
+    Class belonging to the Cost Explorer service.
+    '''
 
     def get_cost(self, tag_names, from_date=None, to_date=None, interval="Monthly"):
         '''
-        Get the cost of an item by its "Name" tag.
+        Get the cost of item/s by its tag "Name".
 
         This method obtains the price of one or several elements (substances, balancers, addresses) between two dates and granularized in days or months.
         If the date is not indicated, the cost of the last month will be returned.
 
         Args:
-            tagnames (lst): List of tag names of machines to obtain data
+            tagnames (lst): List of tag names of machines to obtain data (wildcards are not valid... yet)
             from_date (str): Date from which you want to obtain data. (Format: 2018-04-24)
             to_date (str): Date until which you want to obtain data. (Format: 2018-04-24)
             interval (str):Time interval to be analyzed. [MONTHLY|DAILY]
@@ -44,3 +46,4 @@ class CostExplorerService(AwsBase):
 
     def __init__(self):
         AwsBase.__init__(self, 'ce')
+        self.change_region('us-east-1')

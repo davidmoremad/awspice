@@ -94,6 +94,7 @@ class AwsBase:
         '''
         results = []
         for element in elements:
+            element['TagName'] = next(iter(map(lambda x: x.get('Value',''), filter(lambda x: x['Key'] == 'Name', element.get('Tags','')))),'')
             element['RegionName'] = AwsBase.region
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
@@ -212,7 +213,7 @@ class AwsBase:
             region (str): Region Name (ID) of AWS (i.e.: eu-central-1)
 
         Examples:
-            $ aws.service.ec2.change_region('eu-west-1')
+            aws.service.ec2.change_region('eu-west-1')
 
         Returns:
             None
@@ -232,13 +233,14 @@ class AwsBase:
             default_all (bool): If the list of regions is empty and this argument is True, a list with all regions will be returned. This is useful when you do not know the data entry of type "region" and you want to search by default in all regions (if regions are empty means that the user does not know where an element is located).
 
         Examples:
-            $ region = aws.service.ec2.parse_regions('eu-west-1')
-            $ region_lst = aws.service.ec2.parse_regions(['eu-west-1'])
-            $ regions_lst = aws.service.ec2.parse_regions(['eu-west-1', 'eu-west-2'])
+            regions = aws.service.ec2.parse_regions('eu-west-1')
+            regions = aws.service.ec2.parse_regions(['eu-west-1'])
+            regions = aws.service.ec2.parse_regions(['eu-west-1', 'eu-west-2'])
 
         Returns:
             list. List of a strings with profile names
         '''
+        current_region = self.region
         results = list()
         if isinstance(regions, str):
             results = [{'RegionName':regions}]

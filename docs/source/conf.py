@@ -58,7 +58,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Awspice'
-copyright = u'2017, David El Amrani Herández'
+copyright = u'2017, David Amrani Hernandez'
 author = u'David Amrani Hernandez'
 
 # The version info for the project you're documenting, acts as replacement for

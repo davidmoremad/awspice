@@ -2,6 +2,9 @@
 from base import AwsBase
 
 class RdsService(AwsBase):
+    '''
+    Class belonging to the Remote Database system service.
+    '''
 
     def get_rdss(self):
         '''

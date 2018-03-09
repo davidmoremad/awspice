@@ -20,6 +20,14 @@ awspice.services.base module
     :undoc-members:
     :show-inheritance:
 
+awspice.services.ce module
+--------------------------
+
+.. automodule:: awspice.services.ce
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 awspice.services.ec2 module
 ---------------------------
 
