@@ -6,8 +6,9 @@ class AwsBase:
     '''
     Base class from which all services inherit (ec2, s3, vpc ...)
 
-    This class contains methods and properties that are common to all AWS services and should be accessible by all of them.
-    This class is responsible for instantiating the client and processing information related to the accounts and regions.
+    This class contains methods and properties that are common to all AWS services and should
+    be accessible by all of them. This class is responsible for instantiating the client and
+    processing information related to the accounts and regions.
 
     Attributes:
         client: Boto3 client
@@ -42,12 +43,20 @@ class AwsBase:
         Returns:
             None
         '''
-        self.set_auth_config(service, region, profile=profile, access_key=access_key, secret_key=secret_key)
+        self.set_auth_config(service=service,
+                             region=region,
+                             profile=profile,
+                             access_key=access_key,
+                             secret_key=secret_key)
 
         if AwsBase.profile:
-            self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
-        elif (AwsBase.access_key and AwsBase.secret_key):
-            self.client = boto3.client( service, region_name=AwsBase.region, aws_access_key_id=AwsBase.access_key, aws_secret_access_key=AwsBase.secret_key)
+            self.client = boto3.Session(profile_name=AwsBase.profile).client(service,
+                                                                        region_name=AwsBase.region)
+        elif AwsBase.access_key and AwsBase.secret_key:
+            self.client = boto3.client(service,
+                                        region_name=AwsBase.region,
+                                        aws_access_key_id=AwsBase.access_key,
+                                        aws_secret_access_key=AwsBase.secret_key)
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
 
@@ -62,11 +71,12 @@ class AwsBase:
             secret_key (str): API Secret key
             profile (str): Profile name set in ~/.aws/credentials file
         '''
-        self.service = service
         AwsBase.region = region
 
         if profile and (access_key or secret_key):
-            print '[!] Use Profile or Access keys, not both.'
+            auth_error = 'Use Profile or Access keys, not both.'
+            print '[!] %s' % auth_error
+            raise ValueError(auth_error)
             sys.exit(0)
 
         if profile:
@@ -78,23 +88,25 @@ class AwsBase:
             AwsBase.access_key = access_key
             AwsBase.secret_key = secret_key
 
+    @classmethod
     def inject_client_vars(self, elements):
         '''
         Insert in each item of a list, the region and the current credentials.
 
-        This function is called by all the methods of all the services that return a list of objects,
+        This function is called by all the methods of all the services that return a list of objects
         to identify in what region and account they have been found.
 
         Args:
             elements (list): List of dictionaries
 
         Returns:
-            list. Returns the same list of dictionaries but with the updated elements (region and authentication included)
+            list. Returns same list with the updated elements (region and authentication included)
 
         '''
         results = []
         for element in elements:
-            element['TagName'] = next(iter(map(lambda x: x.get('Value',''), filter(lambda x: x['Key'] == 'Name', element.get('Tags','')))),'')
+            elements_tag_name = filter(lambda x: x['Key'] == 'Name', element.get('Tags',''))
+            element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tag_name)), '')
             element['RegionName'] = AwsBase.region
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
@@ -105,6 +117,7 @@ class AwsBase:
             results.append(element)
         return results
 
+    @classmethod
     def validate_filters(self, filter_key, filters_list):
         '''
         Validate that an item is within a list
@@ -127,6 +140,7 @@ class AwsBase:
     # ------------ PROFILES -----------
     # #################################
 
+    @classmethod
     def get_profiles(self):
         '''
         Get a list of all available profiles in ~/.aws/credentials file
@@ -157,7 +171,7 @@ class AwsBase:
 
     def parse_profiles(self, profiles=[]):
         '''
-        Validation method which get a profile or list of profiles and return the expected list of them
+        Validation method which get a profile or profile list and return the expected list of them
 
         The purpose of this method is that a user can pass different types of data as a "profile"
         argument and obtain a valid output for any method that works with this type of data.
@@ -173,17 +187,14 @@ class AwsBase:
         Returns:
             list. List of a strings with profile names
         '''
-        results = list()
         if isinstance(profiles, str):
             if profiles == 'ALL':
                 return self.get_profiles()
-            else:
-                return [profiles]
+            return [profiles]
 
-        if isinstance(profiles, list) and len(profiles) > 0:
+        if isinstance(profiles, list) and profiles:
             return profiles
-        else:
-            return [self.profile]
+        return [self.profile]
 
 
     # #################################
@@ -197,10 +208,10 @@ class AwsBase:
         Returns:
             list. List of regions with 'Endpoint' and 'RegionName'
         '''
-        curService = self.service
+        currentService = self.service
         self.set_client('ec2', AwsBase.region)
         regions = self.client.describe_regions()['Regions']
-        self.set_client(curService, AwsBase.region)
+        self.set_client(currentService, AwsBase.region)
         return regions
 
     def change_region(self, region):
@@ -230,7 +241,11 @@ class AwsBase:
 
         Args:
             regions (list | str): String or list of string to parse
-            default_all (bool): If the list of regions is empty and this argument is True, a list with all regions will be returned. This is useful when you do not know the data entry of type "region" and you want to search by default in all regions (if regions are empty means that the user does not know where an element is located).
+            default_all (bool): If the list of regions is empty and this argument is True,
+                                a list with all regions will be returned. This is useful when you do
+                                not know the data entry of type "region" and you want to search by
+                                default in all regions (if regions are empty means that the user
+                                does not know where an element is located).
 
         Examples:
             regions = aws.service.ec2.parse_regions('eu-west-1')
@@ -240,13 +255,13 @@ class AwsBase:
         Returns:
             list. List of a strings with profile names
         '''
-        current_region = self.region
         results = list()
         if isinstance(regions, str):
             results = [{'RegionName':regions}]
 
-        elif isinstance(regions, list) and len(regions) > 0:
-            if isinstance(regions[0], dict): return regions
+        elif isinstance(regions, list) and regions:
+            if isinstance(regions[0], dict):
+                return regions
             for region in regions:
                 results.append({'RegionName': region})
         else:
@@ -258,8 +273,9 @@ class AwsBase:
         '''
         This constructor configures the corresponding service according to the class that calls it.
 
-        Every time the EC2Service Class is called (inherits from this class), this constructor will change the client's service to 'ec2'.
-        And then, if ELBService service is called, this method is called again changing the service from 'ec2' to 'elb'.
+        Every time the EC2Service Class is called (inherits from this class), this constructor will
+        change the client's service to 'ec2'. And then, if ELBService service is called, this method
+        is called again changing the service from 'ec2' to 'elb'.
 
         Args:
             service (str): AWS service to uso
@@ -267,6 +283,7 @@ class AwsBase:
         Returns:
             None
         '''
+        self.service = service
         self.set_client(service=service,
                         region=AwsBase.region,
                         access_key=AwsBase.access_key,
