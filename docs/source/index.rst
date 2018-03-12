@@ -28,7 +28,7 @@ Welcome to awspice's documentation!
 .. shields-section
 
 
-|Docs| |Version|
+|Docs| |Version| |Scrutinizer|
 
 
 .. |Docs| image:: https://readthedocs.org/projects/awspice/badge/?version=latest
@@ -37,6 +37,9 @@ Welcome to awspice's documentation!
 .. |Version| image:: http://img.shields.io/pypi/v/awspice.svg?style=flat
     :target: https://pypi.python.org/pypi/awspice/
     :alt: Version
+.. |Scrutinizer| image:: https://scrutinizer-ci.com/g/davidmoremad/awspice/badges/quality-score.png?b=master
+   :target: https://pypi.python.org/pypi/awspice/
+   :alt: Version
 
 .. intro-section
 
