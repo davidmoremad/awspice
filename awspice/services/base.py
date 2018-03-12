@@ -50,8 +50,7 @@ class AwsBase:
                              secret_key=secret_key)
 
         if AwsBase.profile:
-            self.client = boto3.Session(profile_name=AwsBase.profile).client(service,
-                                                                             region_name=AwsBase.region)
+            self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
         elif AwsBase.access_key and AwsBase.secret_key:
             self.client = boto3.client(service,
                                        region_name=AwsBase.region,
@@ -60,7 +59,6 @@ class AwsBase:
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
 
-    @classmethod
     def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
         Set properties like service, region or auth method to be used by boto3 client
