@@ -65,14 +65,16 @@ class ElbService(AwsBase):
 
         if filter_key == 'tagname':
             for region in regions:
+                self.change_region(region)
                 elbs = self.client.describe_load_balancers(LoadBalancerNames=[filter_value])['LoadBalancerDescriptions']
-                if len(elbs) > 0: return self.inject_client_vars(elbs)[0]
+                if elbs:
+                    return self.inject_client_vars(elbs)[0]
         elif filter_key == 'domain' or filter_key == 'cname':
             cname = self._get_cname_from_domain(filter_value) if filter_key == 'domain' else filter_value
             self.change_region(cname.split('.')[1])
 
             elb = [elb for elb in self.get_loadbalancers() if elb['DNSName'].lower() == cname.lower()]
-            return elb[0] if len(elb) > 0 else None
+            return elb[0] if elb else None
 
 
     def __init__(self):

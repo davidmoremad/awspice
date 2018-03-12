@@ -30,12 +30,13 @@ class S3Service(AwsBase):
 
                 public_bucket = {}
                 permissions_to_check = ['READ', 'WRITE']
-                public_acl_indicator = 'http://acs.amazonaws.com/groups/global/AllUsers' # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+                # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+                public_acl_indicator = 'http://acs.amazonaws.com/groups/global/AllUsers'
 
                 for grant in bucket_acl_response['Grants']:
                     for (k, v) in grant.iteritems():
                         if k == 'Permission' and any(permission in v for permission in permissions_to_check):
-                            for (grantee_attrib_k, grantee_attrib_v) in grant['Grantee'].iteritems():
+                            for grantee_attrib_k in grant['Grantee'].keys():
                                 if 'URI' in grantee_attrib_k and grant['Grantee']['URI'] == public_acl_indicator:
                                     if public_bucket.get('Name'):
                                         public_bucket['Permissions'].append(v)
