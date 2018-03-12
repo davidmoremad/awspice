@@ -51,15 +51,16 @@ class AwsBase:
 
         if AwsBase.profile:
             self.client = boto3.Session(profile_name=AwsBase.profile).client(service,
-                                                                        region_name=AwsBase.region)
+                                                                             region_name=AwsBase.region)
         elif AwsBase.access_key and AwsBase.secret_key:
             self.client = boto3.client(service,
-                                        region_name=AwsBase.region,
-                                        aws_access_key_id=AwsBase.access_key,
-                                        aws_secret_access_key=AwsBase.secret_key)
+                                       region_name=AwsBase.region,
+                                       aws_access_key_id=AwsBase.access_key,
+                                       aws_secret_access_key=AwsBase.secret_key)
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
 
+    @classmethod
     def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
         Set properties like service, region or auth method to be used by boto3 client
@@ -71,6 +72,7 @@ class AwsBase:
             secret_key (str): API Secret key
             profile (str): Profile name set in ~/.aws/credentials file
         '''
+        self.service = service
         AwsBase.region = region
 
         if profile and (access_key or secret_key):
@@ -89,7 +91,7 @@ class AwsBase:
             AwsBase.secret_key = secret_key
 
     @classmethod
-    def inject_client_vars(self, elements):
+    def inject_client_vars(cls, elements):
         '''
         Insert in each item of a list, the region and the current credentials.
 
@@ -105,8 +107,8 @@ class AwsBase:
         '''
         results = []
         for element in elements:
-            elements_tag_name = filter(lambda x: x['Key'] == 'Name', element.get('Tags',''))
-            element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tag_name)), '')
+            elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
+            element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
             element['RegionName'] = AwsBase.region
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
@@ -118,7 +120,7 @@ class AwsBase:
         return results
 
     @classmethod
-    def validate_filters(self, filter_key, filters_list):
+    def validate_filters(cls, filter_key, filters_list):
         '''
         Validate that an item is within a list
 
@@ -141,7 +143,7 @@ class AwsBase:
     # #################################
 
     @classmethod
-    def get_profiles(self):
+    def get_profiles(cls):
         '''
         Get a list of all available profiles in ~/.aws/credentials file
 
@@ -208,10 +210,10 @@ class AwsBase:
         Returns:
             list. List of regions with 'Endpoint' and 'RegionName'
         '''
-        currentService = self.service
+        cur_service = self.service
         self.set_client('ec2', AwsBase.region)
         regions = self.client.describe_regions()['Regions']
-        self.set_client(currentService, AwsBase.region)
+        self.set_client(cur_service, AwsBase.region)
         return regions
 
     def change_region(self, region):
