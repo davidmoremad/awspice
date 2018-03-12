@@ -2,7 +2,7 @@ Awspice
 =======
 
 
-|Docs| |Version|
+|Docs| |Version| |Scrutinizer|
 
 
 .. |Docs| image:: https://readthedocs.org/projects/awspice/badge/?version=latest
@@ -11,6 +11,9 @@ Awspice
 .. |Version| image:: http://img.shields.io/pypi/v/awspice.svg?style=flat
     :target: https://pypi.python.org/pypi/awspice/
     :alt: Version
+.. |Scrutinizer| image:: https://scrutinizer-ci.com/g/davidmoremad/awspice/badges/quality-score.png?b=master
+   :target: https://pypi.python.org/pypi/awspice/
+   :alt: Version
 
 Table of content (Full doc in `ReadhTheDocs <http://awspice.readthedocs.io/en/latest/>`_) :
 
