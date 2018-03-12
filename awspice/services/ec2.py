@@ -26,6 +26,7 @@ class Ec2Service(AwsBase):
     volume_filters = {
         'id': 'volume-id',
         'status': 'status',
+        'tagname': 'tag:Name',
     }
 
     secgroup_filters = {
