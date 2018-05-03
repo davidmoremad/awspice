@@ -68,7 +68,7 @@ class Ec2Service(AwsBase):
         Set tag for an instance
 
         Args:
-            elements_id (str): Element that will receive the change of label. (i-0123456890, vol-123456...)
+            elements_id (str): Id of resources to tag. (i.e: i-01234, vol-01234)
             tag_key (str): Name of the element TAG (i.e: Name)
             tag_value (str): Value of that Tag
             regions (lst): Regions where to look for this element
@@ -77,10 +77,12 @@ class Ec2Service(AwsBase):
             None
         '''
         regions = self.parse_regions(regions)
+        tags = [{'Key': tag_key, 'Value': tag_value}]
+
         for region in regions:
             self.change_region(region['RegionName'])
             try:
-                self.client.create_tags(Resources=resource_id, Tags=[{'Key': tag_key, 'Value': tag_value}])
+                self.client.create_tags(Resources=resource_id, Tags=tags)
                 return None
             except ClientError:
                 pass
@@ -107,7 +109,7 @@ class Ec2Service(AwsBase):
 
             amis = self.client.describe_images(Filters=filters)['Images']
             amis = self.inject_client_vars(amis)
-            if return_first and len(amis) > 0:
+            if return_first and amis:
                 return amis[0]
             results.extend(amis)
         return results
@@ -136,8 +138,8 @@ class Ec2Service(AwsBase):
 
         if latest and results:
             return [results[-1]]
-        else:
-            return results
+        
+        return results
 
     def get_ami_by(self, filter_key, filter_value, regions=[]):
         '''
@@ -151,7 +153,10 @@ class Ec2Service(AwsBase):
         Return:
             Image (dict): Image requested
         '''
-        return self.get_amis_by(filter_key=filter_key, filter_value=filter_value, regions=regions, return_first=True)
+        return self.get_amis_by(filter_key=filter_key,
+                                filter_value=filter_value,
+                                regions=regions,
+                                return_first=True)
 
     def get_amis_by(self, filter_key, filter_value, regions=[], return_first=False):
         '''
@@ -203,7 +208,10 @@ class Ec2Service(AwsBase):
             reservations = self.client.describe_instances(Filters=filters)["Reservations"]
             for reserv in reservations:
                 instances = self.inject_client_vars(reserv['Instances'])
-                if return_first and instances: return instances[0]
+                
+                if return_first and instances:
+                    return instances[0]
+
                 results.extend(instances)
 
         return results
@@ -256,20 +264,21 @@ class Ec2Service(AwsBase):
 
         return self._extract_instances(filters=filters, regions=regions, return_first=return_first)
 
-    def create_instances(self, name, key_name, allowed_range, ami=None, distribution=None, version=None, instance_type='t2.micro', region=None, vpc=None, count=1):
+    def create_instances(self, name, key_name, allowed_range, ami=None, distribution=None,
+                         version=None, instance_type='t2.micro', region=None, vpc=None, count=1):
         '''
         Create a new instance
 
         Params:
             name (str): TagName of the instance
             key_name (str): The name of the key pair (i.e: it_user)
-            allowed_range (str): Network range with access permissions to the instance (i.e: 10.0.0.0/32)
+            allowed_range (str): Network range with access to instance (i.e: 10.0.0.0/32)
             ami (str): Id of the ami (i.e: ami-12345)
-            instance_type (str): Type of instance that determines the hardware of the host computer used for your instance (i.e: t2.medium)
-            distribution (str): Instead of ami, select a kind of operative system: ubuntu, windows or redhat (i.e: ubuntu)
-            region (str): Name of the region where the instance will be displayed. (i.e: eu-central-1)
+            instance_type (str): Type of hardware of the instance (i.e: t2.medium)
+            distribution (str): Instead of ami, select an OS: (i.e: ubuntu)
+            region (str): Name of the region where  instance will be displayed
             vpc (str): VPC identifier where the instance will be deployed.
-            count (int): Number of instances to launch. 
+            count (int): Number of instances to launch
 
         Returns:
             Instances (lst): List of launched instances
@@ -292,9 +301,9 @@ class Ec2Service(AwsBase):
                 ami = latest_ami[0]['ImageId']
             else:
                 raise ValueError("Insert a valid AMI or distribution.\nParameters: Distribution={distrib}; Version={version}; ami={ami}".format(
-                    distrib=distribution,
-                    version=version,
-                    ami=ami)
+                        distrib=distribution,
+                        version=version,
+                        ami=ami)
                 )
 
         secgroup_id = str()
@@ -317,7 +326,7 @@ class Ec2Service(AwsBase):
             if secgroup_id:
                 self.delete_security_group(secgroup_id)
             raise
-        
+
 
     # #################################
     # ------------ VOLUMES ------------
@@ -332,7 +341,10 @@ class Ec2Service(AwsBase):
 
             volumes = self.client.describe_volumes(Filters=filters)['Volumes']
             volumes = self.inject_client_vars(volumes)
-            if return_first and len(volumes) > 0: return volumes[0]
+
+            if return_first and volumes:
+                return volumes[0]
+
             results.extend(volumes)
 
         return results
@@ -397,7 +409,8 @@ class Ec2Service(AwsBase):
         Returns:
             Snapshots (lst): List of dictionaries with the snapshots requested
         '''
-        return self.inject_client_vars(self.client.describe_snapshots(OwnerIds=['self'])['Snapshots'])
+        snapshots = self.client.describe_snapshots(OwnerIds=['self'])['Snapshots']
+        return self.inject_client_vars(snapshots)
 
     def get_snapshot_by(self, filter_key, filter_value):
         '''
@@ -411,7 +424,7 @@ class Ec2Service(AwsBase):
             Snapshot (dict): Dictionary with the snapshot requested
         '''
         snapshots = self.get_snapshots_by(filter_key, filter_value)
-        if snapshots and len(snapshots) > 0:
+        if snapshots and snapshots:
             return self.inject_client_vars(snapshots)[0]
         else:
             return None
@@ -462,7 +475,7 @@ class Ec2Service(AwsBase):
             SecurityGroup (dict): Dictionaries with the security group requested
         '''
         secgroup = self.get_secgroups_by(filter_key, filter_value)
-        if len(secgroup) > 0:
+        if secgroup:
             return self.inject_client_vars(secgroup)[0]
         else:
             return None
@@ -484,7 +497,8 @@ class Ec2Service(AwsBase):
             'Values': [filter_value]
         }]
 
-        return self.inject_client_vars(self.client.describe_security_groups(Filters=filters)['SecurityGroups'])
+        secgroups = self.client.describe_security_groups(Filters=filters)['SecurityGroups']
+        return self.inject_client_vars(secgroups)
 
     def create_security_group(self, name, allowed_range, vpc_id=None):
         '''
@@ -543,7 +557,10 @@ class Ec2Service(AwsBase):
 
             addresses = self.client.describe_addresses(Filters=filters)['Addresses']
             addresses = self.inject_client_vars(addresses)
-            if return_first and len(addresses) > 0: return addresses[0]
+            
+            if return_first and addresses:
+                return addresses[0]
+
             results.extend(addresses)
 
         return results
@@ -592,8 +609,10 @@ class Ec2Service(AwsBase):
 
             vpcs = self.client.describe_vpcs(Filters=filters)['Vpcs']
             vpcs = self.inject_client_vars(vpcs)
-            if return_first and len(vpcs) > 0:
+            
+            if return_first and vpcs:
                 return vpcs[0]
+
             results.extend(vpcs)
         return results
 
@@ -615,7 +634,7 @@ class Ec2Service(AwsBase):
         '''
         vpcs = self.get_vpcs()
 
-        return filter(lambda x: x['IsDefault'] == True, vpcs)[0]
+        return filter(lambda x: x['IsDefault'] is True, vpcs)[0]
 
 
 
