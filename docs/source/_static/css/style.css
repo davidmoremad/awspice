@@ -1,7 +1,9 @@
 .method {
   background-color: #f6f6f6;
 }
-
+.wy-nav-content {
+  max-width: 1200px;
+}
 .wy-side-nav-search {
   background: #2f455e;
 }
