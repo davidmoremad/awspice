@@ -51,13 +51,22 @@ class AwsBase:
 
         if AwsBase.profile:
             self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
+            self.resource = boto3.Session(profile_name=AwsBase.profile).resource(
+                service, region_name=AwsBase.region)
+
         elif AwsBase.access_key and AwsBase.secret_key:
             self.client = boto3.client(service,
                                        region_name=AwsBase.region,
                                        aws_access_key_id=AwsBase.access_key,
                                        aws_secret_access_key=AwsBase.secret_key)
+            self.resource = boto3.resource(service,
+                                           region_name=AwsBase.region,
+                                           aws_access_key_id=AwsBase.access_key,
+                                           aws_secret_access_key=AwsBase.secret_key)
+
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
+            self.resource = boto3.resource(service, region_name=AwsBase.region)
 
     def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
@@ -248,6 +257,7 @@ class AwsBase:
                                 does not know where an element is located).
 
         Examples:
+            AwsBase.region = aws.service.ec2.parse_regions([])
             regions = aws.service.ec2.parse_regions('eu-west-1')
             regions = aws.service.ec2.parse_regions(['eu-west-1'])
             regions = aws.service.ec2.parse_regions(['eu-west-1', 'eu-west-2'])
