@@ -138,7 +138,7 @@ class Ec2Service(AwsBase):
 
         if latest and results:
             return [results[-1]]
-        
+
         return results
 
     def get_ami_by(self, filter_key, filter_value, regions=[]):
@@ -208,7 +208,7 @@ class Ec2Service(AwsBase):
             reservations = self.client.describe_instances(Filters=filters)["Reservations"]
             for reserv in reservations:
                 instances = self.inject_client_vars(reserv['Instances'])
-                
+
                 if return_first and instances:
                     return instances[0]
 
@@ -301,9 +301,9 @@ class Ec2Service(AwsBase):
                 ami = latest_ami[0]['ImageId']
             else:
                 raise ValueError("Insert a valid AMI or distribution.\nParameters: Distribution={distrib}; Version={version}; ami={ami}".format(
-                        distrib=distribution,
-                        version=version,
-                        ami=ami)
+                    distrib=distribution,
+                    version=version,
+                    ami=ami)
                 )
 
         secgroup_id = str()
@@ -557,7 +557,7 @@ class Ec2Service(AwsBase):
 
             addresses = self.client.describe_addresses(Filters=filters)['Addresses']
             addresses = self.inject_client_vars(addresses)
-            
+
             if return_first and addresses:
                 return addresses[0]
 
@@ -609,7 +609,7 @@ class Ec2Service(AwsBase):
 
             vpcs = self.client.describe_vpcs(Filters=filters)['Vpcs']
             vpcs = self.inject_client_vars(vpcs)
-            
+
             if return_first and vpcs:
                 return vpcs[0]
 
