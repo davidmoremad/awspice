@@ -303,8 +303,7 @@ class Ec2Service(AwsBase):
                 raise ValueError("Insert a valid AMI or distribution.\nParameters: Distribution={distrib}; Version={version}; ami={ami}".format(
                     distrib=distribution,
                     version=version,
-                    ami=ami)
-                )
+                    ami=ami))
 
         secgroup_id = str()
         try:
@@ -426,8 +425,7 @@ class Ec2Service(AwsBase):
         snapshots = self.get_snapshots_by(filter_key, filter_value)
         if snapshots and snapshots:
             return self.inject_client_vars(snapshots)[0]
-        else:
-            return None
+        return None
 
     def get_snapshots_by(self, filter_key, filter_value):
         '''

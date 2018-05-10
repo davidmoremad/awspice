@@ -28,8 +28,6 @@ class Helpers():
     This class contains the most used methods or some that are quite useful for certain moments,
     for example, to get a specific JSON tag from an instance.
 
-    Examples:
-
     '''
 
     def read_tag(self, tag_key, element):
