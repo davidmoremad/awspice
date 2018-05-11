@@ -24,6 +24,8 @@ class AwsBase:
     access_key = None
     secret_key = None
 
+    service_resources = ['ec2']
+
 
     def set_client(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
@@ -59,14 +61,16 @@ class AwsBase:
                                        region_name=AwsBase.region,
                                        aws_access_key_id=AwsBase.access_key,
                                        aws_secret_access_key=AwsBase.secret_key)
-            self.resource = boto3.resource(service,
-                                           region_name=AwsBase.region,
-                                           aws_access_key_id=AwsBase.access_key,
-                                           aws_secret_access_key=AwsBase.secret_key)
+            if service in self.service_resources:
+                self.resource = boto3.resource(service,
+                                            region_name=AwsBase.region,
+                                            aws_access_key_id=AwsBase.access_key,
+                                            aws_secret_access_key=AwsBase.secret_key)
 
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
-            self.resource = boto3.resource(service, region_name=AwsBase.region)
+            if service in self.service_resources:
+                self.resource = boto3.resource(service, region_name=AwsBase.region)
 
     def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
         '''
