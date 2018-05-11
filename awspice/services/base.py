@@ -53,8 +53,9 @@ class AwsBase:
 
         if AwsBase.profile:
             self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
-            self.resource = boto3.Session(profile_name=AwsBase.profile).resource(
-                service, region_name=AwsBase.region)
+            if service in self.service_resources:
+                self.resource = boto3.Session(profile_name=AwsBase.profile).resource(
+                    service, region_name=AwsBase.region)
 
         elif AwsBase.access_key and AwsBase.secret_key:
             self.client = boto3.client(service,
