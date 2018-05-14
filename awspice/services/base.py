@@ -217,35 +217,6 @@ class AwsBase:
     # ------------ REGIONS ------------
     # #################################
 
-    def get_endpoints(self, service=None):
-        '''
-        Get endpoints for services.
-
-        Return:
-            list. List of services with available regions
-        '''
-        # Load endpoints file
-        endpoint_resource = resource_filename('botocore', 'data/endpoints.json')
-        with open(endpoint_resource, 'r') as f:
-            endpoints = json.load(f)
-
-        # Get regions for "AWS Standard" (Not Gov, China)
-        partitions = filter(lambda x: x['partitionName'] == "AWS Standard",
-                         endpoints['partitions'])[0]
-        default_url = partitions['defaults']['hostname']
-        dns_suffix = partitions['dnsSuffix']
-
-        # Return regions & endpoints by service
-        results = dict()
-        for k, v in partitions['services'].iteritems():
-            url = v.get('defaults', {}).get('hostname', default_url)
-
-            results[k] = {
-                'Regions': v['endpoints'].keys(),
-                'Endpoints': [url.format(service=k, region=region, dnsSuffix=dns_suffix) for region in v['endpoints'].keys()]
-            }
-        return results
-
     def get_regions(self):
         '''
         Get all available regions
@@ -265,7 +236,11 @@ class AwsBase:
         # Return as list
         results = list()
         for k, v in regions.iteritems():
-            results.append({'RegionName': k, 'Country': v['description']})
+            desc = v['description']
+            results.append({'RegionName': k,
+                            'Description': desc,
+                            'Country': desc[desc.find("(")+1:desc.find(")")],
+                            })
         return results
 
     def change_region(self, region):
