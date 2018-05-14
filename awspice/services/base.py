@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys
+import json
 import boto3
+from pkg_resources import resource_filename
 
 class AwsBase:
     '''
@@ -220,13 +222,22 @@ class AwsBase:
         Get all available regions
 
         Returns:
-            list. List of regions with 'Endpoint' and 'RegionName'
+            list. List of regions with 'Country' and 'RegionName'
         '''
-        cur_service = self.service
-        self.set_client('ec2', AwsBase.region)
-        regions = self.client.describe_regions()['Regions']
-        self.set_client(cur_service, AwsBase.region)
-        return regions
+        # Load endpoints file
+        endpoint_resource = resource_filename('botocore', 'data/endpoints.json')
+        with open(endpoint_resource, 'r') as f:
+            endpoints = json.load(f)
+
+        # Get regions for "AWS Standard" (Not Gov, China)
+        regions = filter(lambda x: x['partitionName'] == "AWS Standard",
+                         endpoints['partitions'])[0]['regions']
+
+        # Return as list
+        results = list()
+        for k, v in regions.iteritems():
+            results.append({'RegionName': k, 'Country': v['description']})
+        return results
 
     def change_region(self, region):
         '''
