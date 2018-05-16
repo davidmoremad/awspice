@@ -217,6 +217,35 @@ class AwsBase:
     # ------------ REGIONS ------------
     # #################################
 
+    def get_endpoints(self):
+        '''
+        Get all available regions
+
+        Returns:
+            list. List of regions with 'Country' and 'RegionName'
+        '''
+        # Load endpoints file
+        endpoint_resource = resource_filename(
+            'botocore', 'data/endpoints.json')
+        with open(endpoint_resource, 'r') as f:
+            endpoints = json.load(f)
+
+        # Get regions for "AWS Standard" (Not Gov, China)
+        partitions = filter(lambda x: x['partitionName'] == "AWS Standard",
+                            endpoints['partitions'])[0]
+        dns_suffix = partitions['dnsSuffix']
+        default_url = partitions['defaults']['hostname']
+
+        # Return as list
+        results = dict()
+        for k, v in partitions['services'].iteritems():
+            url = v.get('defaults', {}).get('hostname', default_url)
+            results[k] = {
+                'Regions': v['endpoints'].keys(),
+                'Endpoints': [url.format(service=k, region=region, dnsSuffix=dns_suffix) for region in v['endpoints'].keys()],
+            }
+        return results
+
     def get_regions(self):
         '''
         Get all available regions
