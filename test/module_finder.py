@@ -21,8 +21,10 @@ class ModuleFinderTestCase(unittest.TestCase):
     def test_find_instances(self):
         aws = awspice.connect('eu-west-1')
         instances = aws.finder.find_instances('status', 'running', profiles=['qa'])
-        self.assertEquals(instances[0]['RegionName'], 'eu-west-1')
         self.assertEquals(instances[0]['State']['Name'], 'running')
+        # Verify regions=[] == all regions
+        q_regions = map(lambda x: x['RegionName'], instances)
+        map(lambda x: self.assertTrue(x in ['eu-central-1', 'eu-west-1']), q_regions)
 
 
     def test_find_volume(self):
