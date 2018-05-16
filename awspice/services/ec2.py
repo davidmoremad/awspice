@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from base import AwsBase
+from awspice.services.base import AwsBase
 from botocore.exceptions import ClientError
 
 class Ec2Service(AwsBase):
@@ -300,7 +300,8 @@ class Ec2Service(AwsBase):
             if latest_ami:
                 ami = latest_ami[0]['ImageId']
             else:
-                raise ValueError("Insert a valid AMI or distribution.\nParameters: Distribution={distrib}; Version={version}; ami={ami}".format(
+                raise ValueError("Insert a valid AMI or distribution.\n" +
+                    "Parameters: Distribution={distrib}; Version={version}; ami={ami}".format(
                     distrib=distribution,
                     version=version,
                     ami=ami))
@@ -475,8 +476,7 @@ class Ec2Service(AwsBase):
         secgroup = self.get_secgroups_by(filter_key, filter_value)
         if secgroup:
             return self.inject_client_vars(secgroup)[0]
-        else:
-            return None
+        return None
 
     def get_secgroups_by(self, filter_key, filter_value):
         '''
@@ -632,7 +632,8 @@ class Ec2Service(AwsBase):
         '''
         vpcs = self.get_vpcs()
 
-        return filter(lambda x: x['IsDefault'] is True, vpcs)[0]
+        vpc = filter(lambda x: x['IsDefault'] is True, vpcs)
+        return vpc[0]
 
 
 
