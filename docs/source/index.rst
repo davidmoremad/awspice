@@ -28,7 +28,7 @@ Welcome to awspice's documentation!
 .. shields-section
 
 
-|Docs| |Version| |Scrutinizer|
+|Docs| |Version| |Codacy|
 
 
 .. |Docs| image:: https://readthedocs.org/projects/awspice/badge/?version=latest
@@ -37,9 +37,9 @@ Welcome to awspice's documentation!
 .. |Version| image:: http://img.shields.io/pypi/v/awspice.svg?style=flat
     :target: https://pypi.python.org/pypi/awspice/
     :alt: Version
-.. |Scrutinizer| image:: https://scrutinizer-ci.com/g/davidmoremad/awspice/badges/quality-score.png?b=master
-   :target: https://pypi.python.org/pypi/awspice/
-   :alt: Version
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/827a55c2ed47488c8e642fe799028319
+    :target: https://www.codacy.com/app/davidmoremad/awspice?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=davidmoremad/awspice&amp;utm_campaign=Badge_Grade
+    :alt: Codacy
 
 .. intro-section
 
