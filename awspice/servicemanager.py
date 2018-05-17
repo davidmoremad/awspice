@@ -66,7 +66,6 @@ class ServiceManager:
             access_key (str): API access key of your AWS account
             secret_key (str): API secret key of your AWS account
         '''
-        # AwsBase.region - Region is shared between services
         AwsBase.region = region
         AwsBase.access_key = access_key
         AwsBase.secret_key = secret_key

@@ -29,7 +29,7 @@ class AwsBase:
     service_resources = ['ec2']
 
 
-    def set_client(self, service, region, profile=None, access_key=None, secret_key=None):
+    def set_client(self, service):
         '''
         Main method to set Boto3 client
 
@@ -47,12 +47,12 @@ class AwsBase:
         Returns:
             None
         '''
-        self.set_auth_config(service=service,
-                             region=region,
-                             profile=profile,
-                             access_key=access_key,
-                             secret_key=secret_key)
-
+        # 1. Validate args for authentication
+        self.set_auth_config(region=AwsBase.region,
+                             profile=AwsBase.profile,
+                             access_key=AwsBase.access_key,
+                             secret_key=AwsBase.secret_key)
+        # 2. Set Boto3 client
         if AwsBase.profile:
             self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
             if service in self.service_resources:
@@ -61,21 +61,22 @@ class AwsBase:
 
         elif AwsBase.access_key and AwsBase.secret_key:
             self.client = boto3.client(service,
-                                       region_name=AwsBase.region,
-                                       aws_access_key_id=AwsBase.access_key,
-                                       aws_secret_access_key=AwsBase.secret_key)
+                                    region_name=AwsBase.region,
+                                    aws_access_key_id=AwsBase.access_key,
+                                    aws_secret_access_key=AwsBase.secret_key)
             if service in self.service_resources:
                 self.resource = boto3.resource(service,
                                             region_name=AwsBase.region,
                                             aws_access_key_id=AwsBase.access_key,
                                             aws_secret_access_key=AwsBase.secret_key)
-
+        # If auth isn't provided, set "default" profile (.aws/credentials)
         else:
             self.client = boto3.client(service, region_name=AwsBase.region)
             if service in self.service_resources:
                 self.resource = boto3.resource(service, region_name=AwsBase.region)
 
-    def set_auth_config(self, service, region, profile=None, access_key=None, secret_key=None):
+
+    def set_auth_config(self, region, profile=None, access_key=None, secret_key=None):
         '''
         Set properties like service, region or auth method to be used by boto3 client
 
@@ -86,14 +87,12 @@ class AwsBase:
             secret_key (str): API Secret key
             profile (str): Profile name set in ~/.aws/credentials file
         '''
-        self.service = service
         AwsBase.region = region
 
         if profile and (access_key or secret_key):
             auth_error = 'Use Profile or Access keys, not both.'
             print '[!] %s' % auth_error
             raise ValueError(auth_error)
-            sys.exit(0)
 
         if profile:
             AwsBase.profile = profile
@@ -182,8 +181,9 @@ class AwsBase:
         Returns:
             None
         '''
-        AwsBase.profile = profile
-        self.set_client(self.service, region=AwsBase.region, profile=AwsBase.profile)
+        if profile != AwsBase.profile:
+            AwsBase.profile = profile
+            self.set_client(self.service)
 
     def parse_profiles(self, profiles=[]):
         '''
@@ -287,8 +287,9 @@ class AwsBase:
         Returns:
             None
         '''
-        AwsBase.region = region
-        self.set_client(self.service, region=AwsBase.region)
+        if region != AwsBase.region:
+            AwsBase.region = region
+            self.set_client(self.service)
 
     def parse_regions(self, regions=[], default_all=False):
         '''
@@ -343,8 +344,4 @@ class AwsBase:
             None
         '''
         self.service = service
-        self.set_client(service=service,
-                        region=AwsBase.region,
-                        access_key=AwsBase.access_key,
-                        secret_key=AwsBase.secret_key,
-                        profile=AwsBase.profile)
+        self.set_client(service=service)
