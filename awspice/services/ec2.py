@@ -301,10 +301,10 @@ class Ec2Service(AwsBase):
                 ami = latest_ami[0]['ImageId']
             else:
                 raise ValueError("Insert a valid AMI or distribution.\n" +
-                    "Parameters: Distribution={distrib}; Version={version}; ami={ami}".format(
-                    distrib=distribution,
-                    version=version,
-                    ami=ami))
+                                 "Parameters: Distribution={distrib}; Version={version}; ami={ami}".format(
+                        distrib=distribution,
+                        version=version,
+                        ami=ami))
 
         secgroup_id = str()
         try:

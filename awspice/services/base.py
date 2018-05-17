@@ -120,15 +120,21 @@ class AwsBase:
         '''
         results = []
         for element in elements:
+
+            if element.get('Authorization') and element.get('RegionName'):
+                break
+
             elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
             element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
             element['RegionName'] = AwsBase.region
+
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
             elif AwsBase.access_key and AwsBase.secret_key:
                 element['Authorization'] = {'Type':'AccessKeys', 'Value':AwsBase.access_key}
             else:
                 element['Authorization'] = {'Type':'Profile', 'Value': 'default'}
+
             results.append(element)
         return results
 
