@@ -32,8 +32,8 @@ class ServiceManager:
     def ce(self): return CostExplorerService()
 
 
-
-    def get_auth_config(self):
+    @classmethod
+    def get_auth_config(cls):
         '''
         Get the configuration of the client currently configured
 

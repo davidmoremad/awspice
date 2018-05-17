@@ -39,7 +39,8 @@ class CostExplorerService(AwsBase):
         try:
             datetime.datetime.strptime(from_date, '%Y-%m-%d')
             datetime.datetime.strptime(to_date, '%Y-%m-%d')
-            assert(interval.upper() in ["DAILY", "MONTHLY"])
+            if not interval.upper() in ["DAILY", "MONTHLY"]:
+                raise AssertionError()
         except:
             raise ValueError("Invalid parameters")
 

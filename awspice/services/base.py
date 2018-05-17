@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import sys
 import json
 import boto3
 from pkg_resources import resource_filename
 
-class AwsBase:
+class AwsBase(object):
     '''
     Base class from which all services inherit (ec2, s3, vpc ...)
 

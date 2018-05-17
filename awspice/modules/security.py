@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from . import FinderModule
+from .finder import FinderModule
 
 class SecurityModule:
     '''
@@ -8,7 +8,8 @@ class SecurityModule:
     Methods are available to help improve AWS account security by detecting bad configurations.
     '''
 
-    def get_instance_portlisting(self, aws, instanceid):
+    @classmethod
+    def get_instance_portlisting(cls, aws, instanceid):
         '''
         List SecurityGroups and rules for an instance
 
@@ -20,7 +21,7 @@ class SecurityModule:
             Dictionary with instance and its SecurityGroups
         '''
         results = dict()
-        instance = ModuleFindElements().find_instance(aws, 'id', instanceid)
+        instance = FinderModule(aws).find_instance(aws, 'id', instanceid)
         results.update(instance)
 
         results['SecurityGroups'] = list()
@@ -38,7 +39,8 @@ class SecurityModule:
 
         return {'Instance': results}
 
-    def get_region_portlisting(self, aws, region):
+    @classmethod
+    def get_region_portlisting(cls, aws, region):
         '''
         List SecurityGroups and rules for all instances in region
 

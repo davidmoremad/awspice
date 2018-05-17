@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from servicemanager import ServiceManager
-from services import AwsBase
 from modules import *
-
 from botocore.exceptions import ProfileNotFound, ClientError
 
 
@@ -45,10 +43,10 @@ class AwsManager:
             self.aws.ec2.get_regions()
             print('[OK] Your awspice is ready to give a helping hand :)')
             return True
-        except ProfileNotFound as e:
+        except ProfileNotFound:
             print('[!] You type like a lame pigeon. Profile not found in ~/.aws/credentials file')
             return False
-        except ClientError as e:
+        except ClientError:
             print('[!] Was it so difficult to copy and paste? Invalid credentials. Verify your access keys or permissions for that IAM user')
             return False
 
