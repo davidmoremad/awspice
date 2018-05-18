@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from base import AwsBase
-from ec2 import Ec2Service
 import datetime
 
 class CostExplorerService(AwsBase):

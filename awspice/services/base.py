@@ -19,7 +19,7 @@ class AwsBase(object):
         secret_key: Current secret key used by the client
 
     '''
-
+    endpoints = None
     region = None
     profile = None
     access_key = None
@@ -74,8 +74,8 @@ class AwsBase(object):
             if service in self.service_resources:
                 self.resource = boto3.resource(service, region_name=AwsBase.region)
 
-
-    def set_auth_config(self, region, profile=None, access_key=None, secret_key=None):
+    @classmethod
+    def set_auth_config(cls, region, profile=None, access_key=None, secret_key=None):
         '''
         Set properties like service, region or auth method to be used by boto3 client
 
@@ -126,6 +126,7 @@ class AwsBase(object):
             elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
             element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
             element['RegionName'] = AwsBase.region
+            element['CountryName'] = AwsBase.endpoints['Regions'][AwsBase.region]['Country']
 
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
@@ -222,29 +223,55 @@ class AwsBase(object):
     # ------------ REGIONS ------------
     # #################################
 
-    def get_endpoints(self):
+    @classmethod
+    def _load_endpoints(cls):
         '''
-        Get all available regions
+        Get AWS-Standard partition of endpoints.json file (botocore)
 
         Returns:
-            list. List of regions with 'Country' and 'RegionName'
+            dict: AWS-Standard partition
         '''
-        # Load endpoints file
-        endpoint_resource = resource_filename(
-            'botocore', 'data/endpoints.json')
-        with open(endpoint_resource, 'r') as f:
-            endpoints = json.load(f)
+        if AwsBase.endpoints == None:
+            # Load endpoints file
+            endpoint_resource = resource_filename(
+                'botocore', 'data/endpoints.json')
+            with open(endpoint_resource, 'r') as f:
+                endpoints = json.load(f)
 
-        # Get regions for "AWS Standard" (Not Gov, China)
-        partitions = filter(lambda x: x['partitionName'] == "AWS Standard",
-                            endpoints['partitions'])[0]
-        dns_suffix = partitions['dnsSuffix']
-        default_url = partitions['defaults']['hostname']
+            # Get regions for "AWS Standard" (Not Gov, China)
+            partitions = filter(lambda x: x['partitionName'] == "AWS Standard",
+                                endpoints['partitions'])[0]
+
+            # Format JSON & Save
+            results = dict()
+            results['Regions'] = dict()
+            results['Services'] = partitions['services']
+            results['Defaults'] = partitions['defaults']
+            results['DnsSuffix'] = partitions['dnsSuffix']
+            for k, v in partitions['regions'].iteritems():
+                desc = v['description']
+                results['Regions'][k] = {"Description": desc,
+                                         "Country": desc[desc.find("(")+1:desc.find(")")]}
+            AwsBase.endpoints = results
+
+        return AwsBase.endpoints
+
+
+    def get_endpoints(self):
+        '''
+        Get services and its regions and endpoints
+
+        Returns:
+            dict: Dict with services (key) and its regions and Endpoints.
+        '''
+        partition = self._load_endpoints()
+        dns_suffix = partition['DnsSuffix']
+        default_url = partition['Defaults']['hostname']
 
         # Return as list
         results = dict()
-        for k, v in partitions['services'].iteritems():
-            url = v.get('defaults', {}).get('hostname', default_url)
+        for k, v in partition['Services'].iteritems():
+            url = v.get('Defaults', {}).get('hostname', default_url)
             results[k] = {
                 'Regions': v['endpoints'].keys(),
                 'Endpoints': [url.format(service=k, region=region, dnsSuffix=dns_suffix) for region in v['endpoints'].keys()],
@@ -258,24 +285,7 @@ class AwsBase(object):
         Returns:
             list. List of regions with 'Country' and 'RegionName'
         '''
-        # Load endpoints file
-        endpoint_resource = resource_filename('botocore', 'data/endpoints.json')
-        with open(endpoint_resource, 'r') as f:
-            endpoints = json.load(f)
-
-        # Get regions for "AWS Standard" (Not Gov, China)
-        regions = filter(lambda x: x['partitionName'] == "AWS Standard",
-                         endpoints['partitions'])[0]['regions']
-
-        # Return as list
-        results = list()
-        for k, v in regions.iteritems():
-            desc = v['description']
-            results.append({'RegionName': k,
-                            'Description': desc,
-                            'Country': desc[desc.find("(")+1:desc.find(")")],
-                            })
-        return results
+        return self._load_endpoints()['Regions']
 
     def change_region(self, region):
         '''
@@ -350,3 +360,4 @@ class AwsBase(object):
         '''
         self.service = service
         self.set_client(service=service)
+        AwsBase.endpoints = self._load_endpoints()

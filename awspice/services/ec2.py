@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from awspice.services.base import AwsBase
 from botocore.exceptions import ClientError
-
+import types
 class Ec2Service(AwsBase):
     '''
     Class belonging to the EC2 Computing service.
@@ -76,8 +76,9 @@ class Ec2Service(AwsBase):
         Returns:
             None
         '''
-        regions = self.parse_regions(regions)
         tags = [{'Key': tag_key, 'Value': tag_value}]
+        curRegion = AwsBase.region
+        regions = self.parse_regions(regions)
 
         for region in regions:
             self.change_region(region['RegionName'])
@@ -86,6 +87,9 @@ class Ec2Service(AwsBase):
                 return None
             except ClientError:
                 pass
+            finally:
+                self.change_region(curRegion)
+
         raise Exception('The element {} does not exist for that regions.'.format(resource_id))
 
     # #################################
@@ -93,8 +97,6 @@ class Ec2Service(AwsBase):
     # #################################
 
     def _extract_amis(self, filters=[], regions=[], return_first=False):
-        results = list()
-
         filters.append({'Name': 'state', 'Values': ['available', 'pending']})
         # Just supported x64 OS
         filters.append({'Name': 'architecture', 'Values': ['x86_64']})
@@ -103,15 +105,21 @@ class Ec2Service(AwsBase):
         filters.append({'Name': 'image-type', 'Values': ['machine']})
         filters.append({'Name': 'root-device-type', 'Values': ['ebs']})
 
+        curRegion = AwsBase.region
         regions = self.parse_regions(regions)
+        results = list()
+
         for region in regions:
             self.change_region(region['RegionName'])
 
             amis = self.client.describe_images(Filters=filters)['Images']
             amis = self.inject_client_vars(amis)
             if return_first and amis:
+                self.change_region(curRegion)
                 return amis[0]
             results.extend(amis)
+
+        self.change_region(curRegion)
         return results
 
     def get_amis_by_distribution(self, distrib, version='*', latest=False, regions=[]):
@@ -200,8 +208,9 @@ class Ec2Service(AwsBase):
 
     def _extract_instances(self, filters=[], regions=[], return_first=False):
         results = list()
-
+        curRegion = AwsBase.region
         regions = self.parse_regions(regions)
+
         for region in regions:
             self.change_region(region['RegionName'])
 
@@ -210,10 +219,12 @@ class Ec2Service(AwsBase):
                 instances = self.inject_client_vars(reserv['Instances'])
 
                 if return_first and instances:
+                    self.change_region(curRegion)
                     return instances[0]
 
                 results.extend(instances)
 
+        self.change_region(curRegion)
         return results
 
     def get_instances(self, regions=[]):
@@ -285,6 +296,7 @@ class Ec2Service(AwsBase):
         '''
 
         if region:
+            curRegion = AwsBase.region
             self.change_region(region)
 
         if not vpc:
@@ -326,6 +338,8 @@ class Ec2Service(AwsBase):
             if secgroup_id:
                 self.delete_security_group(secgroup_id)
             raise
+        finally:
+            self.change_region(curRegion)
 
 
     # #################################
@@ -335,6 +349,7 @@ class Ec2Service(AwsBase):
     def _extract_volumes(self, filters=[], regions=[], return_first=False):
         results = list()
 
+        curRegion = AwsBase.region
         regions = self.parse_regions(regions)
         for region in regions:
             self.change_region(region['RegionName'])
@@ -343,10 +358,12 @@ class Ec2Service(AwsBase):
             volumes = self.inject_client_vars(volumes)
 
             if return_first and volumes:
+                self.change_region(curRegion)
                 return volumes[0]
 
             results.extend(volumes)
 
+        self.change_region(curRegion)
         return results
 
     def get_volumes(self, regions=[]):
@@ -549,6 +566,7 @@ class Ec2Service(AwsBase):
     def _extract_addresses(self, filters=[], regions=[], return_first=False):
         results = list()
 
+        curRegion = AwsBase.region
         regions = self.parse_regions(regions)
         for region in regions:
             self.change_region(region['RegionName'])
@@ -557,10 +575,12 @@ class Ec2Service(AwsBase):
             addresses = self.inject_client_vars(addresses)
 
             if return_first and addresses:
+                self.change_region(curRegion)
                 return addresses[0]
 
             results.extend(addresses)
 
+        self.change_region(curRegion)
         return results
 
     def get_addresses(self, regions=[]):
@@ -601,6 +621,7 @@ class Ec2Service(AwsBase):
     def _extract_vpcs(self, filters=[], regions=[], return_first=False):
         results = list()
 
+        curRegion = AwsBase.region
         regions = self.parse_regions(regions)
         for region in regions:
             self.change_region(region['RegionName'])
@@ -609,9 +630,12 @@ class Ec2Service(AwsBase):
             vpcs = self.inject_client_vars(vpcs)
 
             if return_first and vpcs:
+                self.change_region(curRegion)
                 return vpcs[0]
 
             results.extend(vpcs)
+
+        self.change_region(curRegion)
         return results
 
     def get_vpcs(self, regions=[]):

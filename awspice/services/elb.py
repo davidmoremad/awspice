@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from base import AwsBase
-import sys, dns.resolver
+import dns.resolver
 
 
 class ElbService(AwsBase):
@@ -14,7 +14,8 @@ class ElbService(AwsBase):
         'cname': '',
     }
 
-    def _get_cname_from_domain(self, domain):
+    @classmethod
+    def _get_cname_from_domain(cls, domain):
         try:
             cname = str(dns.resolver.query(domain, "CNAME")[0]).rstrip('.')
             if 'aws.com' not in cname: raise ValueError('Domain %s is not in AWS' % domain)

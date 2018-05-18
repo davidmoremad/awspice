@@ -10,26 +10,48 @@ class ServiceManager:
     Each class of service (Ec2Service, S3Service ...) inherits from the AwsBase class.
     '''
 
-    @property
-    def ec2(self): return Ec2Service()
+    _ec2 = None
+    _elb = None
+    _acm = None
+    _iam = None
+    _rds = None
+    _s3 = None
+    _ce = None
 
     @property
-    def elb(self): return ElbService()
+    def ec2(self):
+        if self._ec2 is None: self._ec2 = Ec2Service()
+        return self._ec2
 
     @property
-    def acm(self): return AcmService()
+    def elb(self):
+        if self._elb is None: self._elb = ElbService()
+        return self._elb
 
     @property
-    def iam(self): return IamService()
+    def acm(self):
+        if self._acm is None: self._acm = AcmService()
+        return self._acm
 
     @property
-    def rds(self): return RdsService()
+    def iam(self):
+        if self._iam is None: self._iam = IamService()
+        return self._iam
 
     @property
-    def s3(self): return S3Service()
+    def rds(self):
+        if self._rds is None: self._rds = RdsService()
+        return self._rds
 
     @property
-    def ce(self): return CostExplorerService()
+    def s3(self):
+        if self._s3 is None: self._s3 = S3Service()
+        return self._s3
+
+    @property
+    def ce(self):
+        if self._ce is None: self._ce = CostExplorerService()
+        return self._ce
 
 
     @classmethod
