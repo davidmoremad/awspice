@@ -79,6 +79,8 @@ class ElbService(AwsBase):
             self.change_region(cname.split('.')[1])
             elbs = [elb for elb in self.get_loadbalancers() if elb['DNSName'].lower() == cname.lower()]
 
+        return elbs[0]
+
 
     def __init__(self):
         AwsBase.__init__(self, 'elb')
