@@ -16,16 +16,24 @@ class ElbService(AwsBase):
 
     @classmethod
     def _get_cname_from_domain(cls, domain):
+        '''
+        Get CNAME from a domain
+
+        Raises:
+            dns.resolver.NXDOMAIN: DNS Name not registered.
+            dns.resolver.NoAnswer: DNS Name not found.
+
+        Return:
+            str: String with DNS Canonical Name.
+        '''
         try:
             cname = str(dns.resolver.query(domain, "CNAME")[0]).rstrip('.')
             if 'aws.com' not in cname: raise ValueError('Domain %s is not in AWS' % domain)
             return cname
         except (dns.resolver.NXDOMAIN):
-            print("Couldn't find any records (NXDOMAIN)")
-            raise
+            raise dns.resolver.NXDOMAIN("Couldn't find any records(NXDOMAIN)")
         except (dns.resolver.NoAnswer):
-            print("Couldn't find any records (NoAnswer)")
-            raise
+            raise dns.resolver.NoAnswer("Couldn't find any records (NoAnswer)")
 
 
     def get_loadbalancers(self, regions=[]):
@@ -58,6 +66,10 @@ class ElbService(AwsBase):
             filter_value (str): Value of the filter
             regions (list): Regions where to look for this element
 
+        Raises:
+            dns.resolver.NXDOMAIN: DNS Name not registered.
+            dns.resolver.NoAnswer: DNS Name not found.
+
         Return:
             LoadBalancer (dict): Dictionary with the load balancer requested
         '''
@@ -79,7 +91,9 @@ class ElbService(AwsBase):
             self.change_region(cname.split('.')[1])
             elbs = [elb for elb in self.get_loadbalancers() if elb['DNSName'].lower() == cname.lower()]
 
-        return elbs[0]
+        if elbs:
+            return elbs[0]
+        return None
 
 
     def __init__(self):
