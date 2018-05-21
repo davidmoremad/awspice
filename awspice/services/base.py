@@ -125,8 +125,8 @@ class AwsBase(object):
 
             elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
             element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
-            element['RegionName'] = AwsBase.region
-            element['CountryName'] = AwsBase.endpoints['Regions'][AwsBase.region]['Country']
+            element['Region'] = AwsBase.endpoints['Regions'][AwsBase.region]
+            element['Region']['RegionName'] = AwsBase.region
 
             if AwsBase.profile:
                 element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
