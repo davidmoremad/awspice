@@ -39,6 +39,8 @@ Ec2
    awspice.services.ec2.Ec2Service.get_instance_by
    awspice.services.ec2.Ec2Service.get_instances_by
    awspice.services.ec2.Ec2Service.create_instances
+   awspice.services.ec2.Ec2Service.start_instances
+   awspice.services.ec2.Ec2Service.stop_instances
    awspice.services.ec2.Ec2Service.get_volumes
    awspice.services.ec2.Ec2Service.get_volume_by
    awspice.services.ec2.Ec2Service.get_volumes_by
