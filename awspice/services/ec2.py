@@ -280,7 +280,7 @@ class Ec2Service(AwsBase):
         '''
         Create a new instance
 
-        Params:
+        Args:
             name (str): TagName of the instance
             key_name (str): The name of the key pair (i.e: it_user)
             allowed_range (str): Network range with access to instance (i.e: 10.0.0.0/32)
@@ -340,6 +340,71 @@ class Ec2Service(AwsBase):
             raise
         finally:
             self.change_region(curRegion)
+
+
+    def start_instances(self, instance_ids, regions=[]):
+        '''
+        Stops an Amazon EC2 instance
+
+        Args:
+            instance_ids (lst): List of identifiers of instances to be started.
+
+        Examples:
+            $ aws.service.ec2.start_instances(instances=['i-001'])
+            $ aws.service.ec2.start_instances(instances=['i-001', 'i-033'], regions=['eu-west-1', 'eu-central-1'])
+
+        Returns:
+            lst: List of instances to be started, with their previous and current status.
+        '''
+        regions = self.parse_regions(regions)
+        started_instances = list()
+
+        for region in regions:
+            self.change_region(region['RegionName'])
+
+            for instance in instance_ids:
+                try:
+                    x = self.client.start_instances(InstanceIds=[instance])
+                    started_instances.extend(x['StartingInstances'])
+                    instance_ids.remove(instance)
+
+                except ClientError:
+                    pass
+
+        return started_instances
+
+
+    def stop_instances(self, instance_ids, regions=[], force=False):
+        '''
+        Stops an Amazon EC2 instance
+
+        Args:
+            instance_ids (lst): List of identifiers of instances to be stopped.
+
+        Examples:
+            $ aws.service.ec2.stop_instances(instances=['i-001'])
+            $ aws.service.ec2.stop_instances(instances=['i-001', 'i-033'], regions=['eu-west-1', 'eu-central-1'])
+
+        Returns:
+            lst: List of instances to be stopped, with their previous and current status.
+        '''
+        regions = self.parse_regions(regions)
+        stopped_instances = list()
+
+        for region in regions:
+            self.change_region(region['RegionName'])
+
+            for instance in instance_ids:
+                try:
+                    x = self.client.stop_instances(InstanceIds=[instance], Force=force)
+                    stopped_instances.extend(x['StoppingInstances'])
+                    instance_ids.remove(instance)
+
+                except ClientError:
+                    pass
+
+        return stopped_instances
+
 
 
     # #################################

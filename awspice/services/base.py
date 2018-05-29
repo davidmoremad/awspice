@@ -360,4 +360,5 @@ class AwsBase(object):
         '''
         self.service = service
         self.set_client(service=service)
+        # TODO: Verify unnecesary iterations
         AwsBase.endpoints = self._load_endpoints()
