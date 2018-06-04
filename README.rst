@@ -15,7 +15,7 @@ Awspice
     :target: https://www.codacy.com/app/davidmoremad/awspice?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=davidmoremad/awspice&amp;utm_campaign=Badge_Grade
     :alt: Codacy
 
-Table of content (Full doc in `ReadhTheDocs <http://awspice.readthedocs.io/en/latest/>`_) :
+Table of content (Full doc in `ReadTheDocs <http://awspice.readthedocs.io/en/latest/>`_) :
 
 * `Installation <#installation>`_
 * `Configuration <#configuration>`_
