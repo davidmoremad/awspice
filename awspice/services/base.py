@@ -302,9 +302,8 @@ class AwsBase(object):
         Returns:
             None
         '''
-        if region != AwsBase.region:
-            AwsBase.region = region
-            self.set_client(self.service)
+        AwsBase.region = region
+        self.set_client(self.service)
 
     def parse_regions(self, regions=[], default_all=False):
         '''
