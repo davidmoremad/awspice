@@ -1,11 +1,28 @@
 # -*- coding: utf-8 -*-
 from awspice.services.base import AwsBase
 from botocore.exceptions import ClientError
+import StringIO
 
 class S3Service(AwsBase):
     '''
     Class belonging to the S3 Storage service.
     '''
+
+    def upload_string_as_file(self, bucket_name, filepath, content):
+        '''
+        Upload string as a file to S3 bucket
+
+        Args:
+            bucket_name (str): Name of the S3 bucket
+            filepath (str): File path which will be created. (i.e. 'folder1/folder2/filename.txt')
+            content (str): File content in string format.
+
+        Returns:
+            None
+        '''
+        data = StringIO.StringIO(content)
+        self.resource.Bucket(bucket_name).put_object(Key=filepath, Body=data)
+
 
     def get_buckets(self):
         '''

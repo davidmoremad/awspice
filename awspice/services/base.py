@@ -25,7 +25,7 @@ class AwsBase(object):
     access_key = None
     secret_key = None
 
-    service_resources = ['ec2']
+    service_resources = ['ec2', 's3']
 
 
     def set_client(self, service):
