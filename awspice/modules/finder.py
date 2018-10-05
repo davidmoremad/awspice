@@ -22,7 +22,7 @@ class FinderModule:
             if instance: return instance
         return None
 
-    def find_instances(self, filter_key, filter_value, profiles=[], regions=[]):
+    def find_instances(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
         '''
         Searches for a group of instances in different accounts and regions, using search filters.
         '''
@@ -32,7 +32,10 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            results.extend(self.aws.ec2.get_instances_by(filter_key, filter_value, regions=regions))
+            if filter_key and filter_value:
+                results.extend(self.aws.ec2.get_instances_by(filter_key, filter_value, regions=regions))
+            else:
+                results.extend(self.aws.ec2.get_instances(regions))
         return results
 
     def find_volume(self, filter_key, filter_value, profiles=[], regions=[]):
