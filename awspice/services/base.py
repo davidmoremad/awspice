@@ -138,6 +138,22 @@ class AwsBase(object):
             results.append(element)
         return results
 
+    def region_in_regions(self, region, regions):
+        '''
+        Check if region is in a complex list of regions
+
+        Args:
+            region (str | lst) - Region name or parsed region format {'RegionName': 'eu-west-1'}
+            regions (lst) - List of strings or dicts of regions
+
+        Examples:
+            region_in_regions('eu-west-1', [{'RegionName': 'eu-west-1}])
+
+        Returns:
+            bool
+        '''
+        return self.parse_regions(region)[0] in self.parse_regions(regions)
+
     @classmethod
     def validate_filters(cls, filter_key, filters_list):
         '''

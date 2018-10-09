@@ -277,8 +277,9 @@ class Ec2Service(AwsBase):
 
         # DNS name of AWS instances ends with region.service.amazonaws.com.
         if (filter_key == 'publicip'):
-            if (dnsinfo_from_ip(filter_value)):
-                regions = [dnsinfo_from_ip(filter_value)['region']]
+            hostname = dnsinfo_from_ip(filter_value)
+            if (hostname and self.region_in_regions(hostname['region'], regions)):
+                regions = [hostname['region']]
             else:
                 return list()
 

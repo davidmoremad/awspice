@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from awspice.helpers import ip_in_aws
+from awspice.helpers import ip_in_aws, dnsinfo_from_ip
 
 class FinderModule:
     '''
@@ -10,6 +10,24 @@ class FinderModule:
 
     '''
 
+    def _filters_validation(self, filter_key, filter_value, regions):
+        '''
+        Check some previous test to filters before do the main action.
+
+        Args:
+            filter_key (str)
+            filter_value (str)
+
+        Return:
+            bool: True if filters are validated
+        '''
+        result = bool()
+
+        if filter_key == 'publicip':
+            hostname = dnsinfo_from_ip(filter_value)
+            result = bool(hostname) and self.aws.ec2.region_in_regions(hostname['region'], regions)
+
+        return result
 
     def find_instance(self, filter_key, filter_value, profiles=[], regions=[]):
         '''
@@ -18,9 +36,9 @@ class FinderModule:
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
 
-        if filter_key == 'publicip' and not ip_in_aws(filter_value):
+        if not self._filters_validation(filter_key, filter_value, regions):
             return None
-
+            
         for account in profiles:
             self.aws.ec2.change_profile(account)
             instance = self.aws.ec2.get_instance_by(filter_key, filter_value, regions=regions)
@@ -35,8 +53,6 @@ class FinderModule:
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
 
-        if filter_key == 'publicip' and not ip_in_aws(filter_value):
-            return None
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
