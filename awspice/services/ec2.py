@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from awspice.services.base import AwsBase
+from awspice.helpers import dnsinfo_from_ip
 from botocore.exceptions import ClientError
 import types
+
 class Ec2Service(AwsBase):
     '''
     Class belonging to the EC2 Computing service.
@@ -272,6 +274,13 @@ class Ec2Service(AwsBase):
             'Name': self.instance_filters[filter_key],
             'Values': [filter_value]
         }]
+
+        # DNS name of AWS instances ends with region.service.amazonaws.com.
+        if (filter_key == 'publicip'):
+            if (dnsinfo_from_ip(filter_value)):
+                regions = [dnsinfo_from_ip(filter_value)['region']]
+            else:
+                return list()
 
         return self._extract_instances(filters=filters, regions=regions, return_first=return_first)
 

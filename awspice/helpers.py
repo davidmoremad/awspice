@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import datetime
+import socket
 from time import mktime
 
 class ClsEncoder(json.JSONEncoder):
@@ -21,23 +22,40 @@ class ClsEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-class Helpers():
+
+def ip_in_aws(ip):
     '''
-    Class with useful and more used methods.
+    Check if an IP address is from AWS
 
-    This class contains the most used methods or some that are quite useful for certain moments,
-    for example, to get a specific JSON tag from an instance.
+    Arguments:
+        ip: Address to check 
 
+    Returns:
+        bool
     '''
+    return bool(dnsinfo_from_ip(ip))
 
-    def read_tag(self, tag_key, element):
-        '''
-        Returns the value of a specific tag
+def dnsinfo_from_ip(ip):
+    '''
+    Returns the DNS name of an IP address
 
-        Arguments:
-            tag_key: Name of the Key of the Tag.
-            element: Object from which you want to obtain the tag
+    Arguments:
+        ip: Address of the element.
 
-        Examples:
-            project = read_tag('Project', myvolume)
-        '''
+    Examples:
+        dns = get_dnsname_from_ip('8.8.8.8')
+
+    Returns:
+        dict: {'region': 'eu-west-1', 'service': 'ec2'}
+    '''
+    result = {}
+    service_matchs = {'compute': 'ec2'}
+    try:
+        hostname = socket.gethostbyaddr(ip)[0]
+        if hostname.endswith('aws.com'):
+            result['region'] = hostname.split('.')[1]
+            service = hostname.split('.')[2]
+            result['service'] = service_matchs[service] if service in service_matchs.keys() else service
+    except socket.herror:
+        pass
+    return result

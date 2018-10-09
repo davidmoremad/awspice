@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from awspice.helpers import ip_in_aws
 
 class FinderModule:
     '''
@@ -9,12 +10,16 @@ class FinderModule:
 
     '''
 
+
     def find_instance(self, filter_key, filter_value, profiles=[], regions=[]):
         '''
         Searches for an instance in different accounts and regions, using search filters.
         '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
+
+        if filter_key == 'publicip' and not ip_in_aws(filter_value):
+            return None
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
@@ -29,6 +34,9 @@ class FinderModule:
         results = list()
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
+
+        if filter_key == 'publicip' and not ip_in_aws(filter_value):
+            return None
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
@@ -65,6 +73,7 @@ class FinderModule:
             regions = self.aws.ec2.parse_regions(regions, True)
             results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
         return results
+
 
     def __init__(self, aws):
         self.aws = aws
