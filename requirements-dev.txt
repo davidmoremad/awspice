@@ -5,6 +5,6 @@
 pytest==2.9.2
 
 # Documentation
-Sphinx==1.4
+Sphinx
 sphinx_rtd_theme
 sphinxcontrib.napoleon
