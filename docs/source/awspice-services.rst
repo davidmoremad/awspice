@@ -92,5 +92,6 @@ S3
 
 .. autosummary::
 
+   awspice.services.s3.S3Service.upload_string_as_file
    awspice.services.s3.S3Service.get_buckets
    awspice.services.s3.S3Service.get_public_buckets
