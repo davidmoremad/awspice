@@ -103,7 +103,7 @@ class CostExplorerService(AwsBase):
             for key, value in filters.iteritems():
                 tagvalue = value if isinstance(value, list) else [value]
                 if key.upper().startswith('TAG_'):
-                    tagkey = key.replace('tag_', '').title()
+                    tagkey = key[4:].title()
                     result['Tags'] = {'Key': tagkey, 'Values': tagvalue}
                 elif key.upper() in self.filter_dimensions:
                     result['Dimensions'] = {'Key': key.upper(), 'Values': tagvalue}
