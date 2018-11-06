@@ -21,7 +21,7 @@ class FinderModule:
         Return:
             bool: True if filters are validated
         '''
-        result = bool()
+        result = True
 
         if filter_key == 'publicip':
             hostname = dnsinfo_from_ip(filter_value)
@@ -35,7 +35,6 @@ class FinderModule:
         '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
-
         if not self._filters_validation(filter_key, filter_value, regions):
             return None
             
