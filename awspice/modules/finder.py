@@ -87,7 +87,7 @@ class FinderModule:
             if filter_key and filter_value:
                 results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
             else:
-                results.extend(self.aws.ec2.get_volumes_by(regions=regions))
+                results.extend(self.aws.ec2.get_volumes(regions=regions))
         return results
 
 
