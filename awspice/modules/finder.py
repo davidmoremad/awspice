@@ -91,5 +91,20 @@ class FinderModule:
         return results
 
 
+    def find_loadbalancers(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
+        results = list()
+        profiles = self.aws.ec2.parse_profiles(profiles)
+        regions = self.aws.ec2.parse_regions(regions, True)
+
+        for account in profiles:
+            self.aws.elb.change_profile(account)
+            if filter_key and filter_value:
+                results.extend(self.aws.ec2.get_loadbalancers_by(filter_key, filter_value, regions=regions))
+            else:
+                results.extend(self.aws.elb.get_loadbalancers(regions=regions))
+        return results
+        
+        
+
     def __init__(self, aws):
         self.aws = aws
