@@ -58,7 +58,7 @@ class FinderModule:
             if filter_key and filter_value:
                 results.extend(self.aws.ec2.get_instances_by(filter_key, filter_value, regions=regions))
             else:
-                results.extend(self.aws.ec2.get_instances(regions))
+                results.extend(self.aws.ec2.get_instances(regions=regions))
         return results
 
     def find_volume(self, filter_key, filter_value, profiles=[], regions=[]):
@@ -70,12 +70,11 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            regions = self.aws.ec2.parse_regions(regions, True)
             volume = self.aws.ec2.get_volume_by(filter_key, filter_value, regions=regions)
             if volume: return volume
         return None
 
-    def find_volumes(self, filter_key, filter_value, profiles=[], regions=[]):
+    def find_volumes(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
         '''
         Searches for a group of volumes in different accounts and regions, using search filters.
         '''
@@ -85,8 +84,10 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            regions = self.aws.ec2.parse_regions(regions, True)
-            results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
+            if filter_key and filter_value:
+                results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
+            else:
+                results.extend(self.aws.ec2.get_volumes_by(regions=regions))
         return results
 
 
