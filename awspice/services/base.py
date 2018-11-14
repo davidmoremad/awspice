@@ -352,7 +352,7 @@ class AwsBase(object):
         elif isinstance(regions, list) and regions:
             if isinstance(regions[0], dict):
                 return regions
-            for region in regions:
+            for region in set(regions):
                 results.append({'RegionName': region})
         else:
             results = self.get_regions() if default_all else [{'RegionName': AwsBase.region}]
