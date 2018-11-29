@@ -51,11 +51,21 @@ def dnsinfo_from_ip(ip):
     result = {}
     service_matchs = {'compute': 'ec2'}
     try:
-        hostname = socket.gethostbyaddr(ip)[0]
-        if hostname.endswith('aws.com'):
-            result['region'] = hostname.split('.')[1]
-            service = hostname.split('.')[2]
-            result['service'] = service_matchs[service] if service in service_matchs.keys() else service
+        host = socket.gethostbyaddr(ip)[0]
+        if host.endswith('aws.com'):
+            # ELASTIC IPs > name.service.aws.com (4)
+            # AUTOASSIGNED IPs > name.region.service.aws.com (5)
+            service = host.split('.')[2]
+            if service in service_matchs.keys():
+                service = service_matchs[service]
+
+            if len(host.split('.')) == 5:
+                region = host.split('.')[1]
+            else:
+                region = None
+            
+            result = {'region': region, 'service': service}
+        return result
     except socket.herror:
         pass
     return result
