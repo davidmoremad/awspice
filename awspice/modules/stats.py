@@ -24,21 +24,21 @@ class StatsModule:
         results = dict()
         regions = self.aws.ec2.parse_regions(regions)
 
-        results['Users'] = self.aws.iam.get_users();
-        results['Buckets'] = self.aws.s3.get_buckets();
+        results['Users'] = self.aws.iam.get_users()
+        results['Buckets'] = self.aws.s3.get_buckets()
         results['Regions'] = dict()
         for region in regions:
             self.aws.ec2.change_region(region['RegionName'])
             data = dict()
-            data['Instances'] = self.aws.ec2.get_instances();
-            data['SecurityGroups'] = self.aws.ec2.get_secgroups();
-            data['Volumes'] = self.aws.ec2.get_volumes();
+            data['Instances'] = self.aws.ec2.get_instances()
+            data['SecurityGroups'] = self.aws.ec2.get_secgroups()
+            data['Volumes'] = self.aws.ec2.get_volumes()
             # data['Snapshots'] = self.aws.ec2.get_snapshots();  # Need to select only private snaps
-            data['Addresses'] = self.aws.ec2.get_addresses();
-            data['Vpcs'] = self.aws.ec2.get_vpcs();
-            data['LoadBalancers'] = self.aws.elb.get_loadbalancers();
-            data['Databases'] = self.aws.rds.get_rdss();
-            data['Certificates'] = self.aws.acm.list_certificates();
+            data['Addresses'] = self.aws.ec2.get_addresses()
+            data['Vpcs'] = self.aws.ec2.get_vpcs()
+            data['LoadBalancers'] = self.aws.elb.get_loadbalancers()
+            data['Databases'] = self.aws.rds.get_rdss()
+            data['Certificates'] = self.aws.acm.list_certificates()
             results['Regions'][region['RegionName']] = data
         return results
 
