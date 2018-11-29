@@ -89,9 +89,7 @@ class AwsBase(object):
         AwsBase.region = region
 
         if profile and (access_key or secret_key):
-            auth_error = 'Use Profile or Access keys, not both.'
-            print '[!] %s' % auth_error
-            raise ValueError(auth_error)
+            raise ValueError('Use Profile or Access keys, not both.')
 
         if profile:
             AwsBase.profile = profile
@@ -122,16 +120,16 @@ class AwsBase(object):
 
             if element.get('Authorization') and element.get('RegionName'):
                 break
-
+                
             elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
             element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
-            element['Region'] = AwsBase.endpoints['Regions'][AwsBase.region]
-            element['Region']['RegionName'] = AwsBase.region
+            element['Region'] = dict(AwsBase.endpoints['Regions'][AwsBase.region]) # [!] used dict() to avoid to rewrite object AwsBase in next line
+            element['Region']['RegionName'] = str(AwsBase.region)
 
             if AwsBase.profile:
-                element['Authorization'] = {'Type':'Profile', 'Value':AwsBase.profile}
+                element['Authorization'] = {'Type':'Profile', 'Value': str(AwsBase.profile)}
             elif AwsBase.access_key and AwsBase.secret_key:
-                element['Authorization'] = {'Type':'AccessKeys', 'Value':AwsBase.access_key}
+                element['Authorization'] = {'Type':'AccessKeys', 'Value': str(AwsBase.access_key)}
             else:
                 element['Authorization'] = {'Type':'Profile', 'Value': 'default'}
 
@@ -249,8 +247,7 @@ class AwsBase(object):
         '''
         if AwsBase.endpoints == None:
             # Load endpoints file
-            endpoint_resource = resource_filename(
-                'botocore', 'data/endpoints.json')
+            endpoint_resource = resource_filename('botocore', 'data/endpoints.json')
             with open(endpoint_resource, 'r') as f:
                 endpoints = json.load(f)
 
@@ -346,16 +343,31 @@ class AwsBase(object):
             list. List of a strings with profile names
         '''
         results = list()
+
+        # regions = 'eu-west-1'
         if isinstance(regions, str):
             results = [{'RegionName':regions}]
 
+        # regions = ['eu-west-1'] or [{'RegionName': 'eu-west-1}]
         elif isinstance(regions, list) and regions:
-            if isinstance(regions[0], dict):
+            if isinstance(regions[0], dict) and regions[0].get('RegionName', False):
                 return regions
-            for region in set(regions):
-                results.append({'RegionName': region})
+            elif isinstance(regions[0], str):
+                [results.append({'RegionName': region}) for region in set(regions)]
+            else:
+                raise ValueError('Invalid regions value.')
+
+        # regions = {'eu-west-1': {...}, 'eu-central-1' : {...} }  <--- AwsBase.endpoints['Regions']
+        elif isinstance(regions, dict) and regions:
+            if regions.get('eu-west-1', False):
+                [results.append({'RegionName': region}) for region in regions.keys()]
+            else:
+                raise ValueError('Invalid regions value.')
+
+        # regions = None <--- Get current or all regions
         else:
             results = self.get_regions() if default_all else [{'RegionName': AwsBase.region}]
+
         return results
 
 
@@ -376,4 +388,5 @@ class AwsBase(object):
         self.service = service
         self.set_client(service=service)
         # TODO: Verify unnecesary iterations
-        AwsBase.endpoints = self._load_endpoints()
+        self._load_endpoints()
+
