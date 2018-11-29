@@ -268,22 +268,26 @@ class Ec2Service(AwsBase):
         Return:
             Instances (lst): List of dictionaries with the instances requested
         '''
-        self.validate_filters(filter_key, self.instance_filters)
+        results = []
 
+        self.validate_filters(filter_key, self.instance_filters)
         filters = [{
             'Name': self.instance_filters[filter_key],
             'Values': [filter_value]
         }]
-
-        # DNS name of AWS instances ends with region.service.amazonaws.com.
+        
+        # The DNS name of instance autoassigned IPs has this format: region.service.amazonaws.com. (Not for Elastic IPs)
         if (filter_key == 'publicip'):
             hostname = dnsinfo_from_ip(filter_value)
-            if (hostname and self.region_in_regions(hostname['region'], regions)):
+            # IP not in AWS
+            if not hostname: return results
+            
+            # Region in DNSName
+            if (hostname['region']) and (hostname['region'] in regions or hostname['region'] in map(lambda x: x['RegionName'],regions)):
                 regions = [hostname['region']]
-            else:
-                return list()
-
-        return self._extract_instances(filters=filters, regions=regions, return_first=return_first)
+        
+        results = self._extract_instances(filters=filters, regions=regions, return_first=return_first)
+        return results
 
     def create_instances(self, name, key_name, allowed_range, ami=None, distribution=None,
                          version=None, instance_type='t2.micro', region=None, vpc=None, count=1):
