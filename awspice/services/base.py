@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import boto3
+from awspice.helpers import ThreadPool
 from pkg_resources import resource_filename
 
 class AwsBase(object):
@@ -24,6 +25,9 @@ class AwsBase(object):
     profile = None
     access_key = None
     secret_key = None
+
+    # THREADS NUMBER
+    pool = ThreadPool(10)
 
     service_resources = ['ec2', 's3']
 
@@ -101,7 +105,26 @@ class AwsBase(object):
             AwsBase.secret_key = secret_key
 
     @classmethod
-    def inject_client_vars(cls, elements):
+    def get_client_vars(cls):
+        '''Get information of the current client configuration
+        Sometimes we need to store this variables, for example using threads, 
+        because AwsBase is constantly changing 
+        
+        Returns:
+            dict: Array with current client configuration ({'region': 'eu-west-1', 'profile': 'default'})
+        '''
+
+        _region_name = str(AwsBase.region)
+        _region = dict(AwsBase.endpoints['Regions'][_region_name], RegionName=_region_name)
+        _profile = str(AwsBase.profile)
+        _accesskey = str(AwsBase.access_key)
+
+        return {'region': _region, 'profile': _profile, 'access_key': _accesskey}
+
+
+
+    @classmethod
+    def inject_client_vars(cls, elements, client_conf=None):
         '''
         Insert in each item of a list, the region and the current credentials.
 
@@ -110,12 +133,20 @@ class AwsBase(object):
 
         Args:
             elements (list): List of dictionaries
+            client_conf (dict): Array with the client configuration (see `get_client_vars`)
 
         Returns:
             list. Returns same list with the updated elements (region and authentication included)
 
         '''
+
+        # [!] used dict() to avoid to rewrite object AwsBase in next line
+        _region_name = client_conf['region']['RegionName'] if client_conf else str(AwsBase.region)
+        _region_dict = client_conf['region'] if client_conf else dict(AwsBase.endpoints['Regions'][_region_name])
+        _profile =     client_conf['profile'] if client_conf else str(AwsBase.profile)
+        _accesskey =   client_conf['access_key'] if client_conf else str(AwsBase.access_key)
         results = []
+
         for element in elements:
 
             if element.get('Authorization') and element.get('RegionName'):
@@ -123,17 +154,17 @@ class AwsBase(object):
                 
             elements_tagname = filter(lambda x: x['Key'] == 'Name', element.get('Tags', ''))
             element['TagName'] = next(iter(map(lambda x: x.get('Value', ''), elements_tagname)), '')
-            element['Region'] = dict(AwsBase.endpoints['Regions'][AwsBase.region]) # [!] used dict() to avoid to rewrite object AwsBase in next line
-            element['Region']['RegionName'] = str(AwsBase.region)
+            element['Region'] = _region_dict
 
-            if AwsBase.profile:
-                element['Authorization'] = {'Type':'Profile', 'Value': str(AwsBase.profile)}
-            elif AwsBase.access_key and AwsBase.secret_key:
-                element['Authorization'] = {'Type':'AccessKeys', 'Value': str(AwsBase.access_key)}
+            if _profile:
+                element['Authorization'] = {'Type':'Profile', 'Value': _profile}
+            elif _accesskey:
+                element['Authorization'] = {'Type':'AccessKeys', 'Value': _accesskey}
             else:
                 element['Authorization'] = {'Type':'Profile', 'Value': 'default'}
 
             results.append(element)
+
         return results
 
     def region_in_regions(self, region, regions):

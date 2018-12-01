@@ -2,12 +2,14 @@
 from awspice.services.base import AwsBase
 from awspice.helpers import dnsinfo_from_ip
 from botocore.exceptions import ClientError
-import types
+from threading import Lock
+import time
 
 class Ec2Service(AwsBase):
     '''
     Class belonging to the EC2 Computing service.
     '''
+
 
     ami_filters = {
         'id': 'image-id',
@@ -209,22 +211,34 @@ class Ec2Service(AwsBase):
     # #################################
 
     def _extract_instances(self, filters=[], regions=[], return_first=False):
-        results = list()
-        curRegion = AwsBase.region
+        curRegion = str(AwsBase.region)
         regions = self.parse_regions(regions)
+        results = dict() if return_first else list() 
 
-        for region in regions:
-            self.change_region(region['RegionName'])
+        lock = Lock()
+        def worker(item):
+            # Race Condition: Locking AwsBase.region...
+            lock.acquire()
+            self.change_region(item['RegionName'])
+            config = self.get_client_vars()
+            lock.release()
 
             reservations = self.client.describe_instances(Filters=filters)["Reservations"]
             for reserv in reservations:
-                instances = self.inject_client_vars(reserv['Instances'])
+                instances = self.inject_client_vars(reserv['Instances'], config)
 
                 if return_first and instances:
-                    self.change_region(curRegion)
-                    return instances[0]
+                    results.update(instances[0])
+                if not return_first and instances:
+                    results.extend(instances)
 
-                results.extend(instances)
+        # Launch tasks in threads
+        for region in regions:
+            self.pool.add_task(worker, item=region)
+
+        # Wait results
+        if return_first: self.pool.wait_results(results)
+        else: self.pool.wait_completion()
 
         self.change_region(curRegion)
         return results
