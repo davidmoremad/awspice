@@ -33,6 +33,7 @@ class S3Service(AwsBase):
         '''
         return self.inject_client_vars(self.client.list_buckets()['Buckets'])
 
+
     def get_public_buckets(self):
         '''
         Get all public readable or writable buckets in S3
@@ -41,8 +42,8 @@ class S3Service(AwsBase):
             Buckets-ACL (list): List of dictionaries with the buckets requested
         '''
         buckets = []
-        for bucket in self.get_buckets():
 
+        def worker(bucket):
             try:
                 bucket_acl = self.client.get_bucket_acl(Bucket=bucket['Name'])
 
@@ -63,11 +64,22 @@ class S3Service(AwsBase):
                 if public_bucket:
                     buckets.append(public_bucket)
 
-            except ClientError:
-                # Exception: Lack of permissions
-                pass
+            # AccessDenied getting GetBucketAcl
+            except ClientError as e: pass
+
+        # Launch tasks in threads
+        for bucket in self.get_buckets():
+            self.pool.add_task(worker, bucket=bucket)
+        # Wait results
+        self.pool.wait_completion()
 
         return self.inject_client_vars(buckets)
+
+    def list_bucket_objects(self, bucket):
+        return self.client.list_objects(Bucket=bucket)['Contents']
+
+
+
 
     def __init__(self):
         AwsBase.__init__(self, 's3')
