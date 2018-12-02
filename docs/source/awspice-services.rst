@@ -65,6 +65,7 @@ Elb
 .. autosummary::
 
    awspice.services.elb.ElbService.get_loadbalancers
+   awspice.services.elb.ElbService.get_loadbalancers_by
    awspice.services.elb.ElbService.get_loadbalancer_by
 
 
@@ -95,3 +96,4 @@ S3
    awspice.services.s3.S3Service.upload_string_as_file
    awspice.services.s3.S3Service.get_buckets
    awspice.services.s3.S3Service.get_public_buckets
+   awspice.services.s3.S3Service.list_bucket_objects

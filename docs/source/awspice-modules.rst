@@ -14,6 +14,7 @@ Finder
    awspice.modules.finder.FinderModule.find_instances
    awspice.modules.finder.FinderModule.find_volume
    awspice.modules.finder.FinderModule.find_volumes
+   awspice.modules.finder.FinderModule.find_loadbalancer
    awspice.modules.finder.FinderModule.find_loadbalancers
 
 
