@@ -384,11 +384,11 @@ class AwsBase(object):
         if isinstance(regions, str):
             results = [{'RegionName':regions}]
 
-        # regions = ['eu-west-1'] or [{'RegionName': 'eu-west-1}]
+        # regions = ['eu-west-1'] or [u'eu-west-1'] or [{'RegionName': 'eu-west-1}]
         elif isinstance(regions, list) and regions:
             if isinstance(regions[0], dict) and regions[0].get('RegionName', False):
                 return regions
-            elif isinstance(regions[0], str):
+            elif isinstance(regions[0], basestring):
                 [results.append({'RegionName': region}) for region in set(regions)]
             else:
                 raise ValueError('Invalid regions value.')
