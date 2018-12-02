@@ -40,12 +40,7 @@ class ThreadPool:
     def wait_completion(self):
         """Wait for completion of all the tasks in the queue"""
         self.tasks.join()
-
-    def wait_results(self, results):
-        """Wait for results has some value"""
-        import time
-        while(not results):
-            time.sleep(0.2)
+        
 
 class ClsEncoder(json.JSONEncoder):
     '''

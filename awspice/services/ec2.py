@@ -211,13 +211,13 @@ class Ec2Service(AwsBase):
     # #################################
 
     def _extract_instances(self, filters=[], regions=[], return_first=False):
-        curRegion = str(AwsBase.region)
         regions = self.parse_regions(regions)
-        results = dict() if return_first else list() 
+        results = dict() if return_first else list()
 
         lock = Lock()
         def worker(item):
             # Race Condition: Locking AwsBase.region...
+            # Change region > Get client config > Do the query
             lock.acquire()
             self.change_region(item['RegionName'])
             config = self.get_client_vars()
@@ -237,10 +237,7 @@ class Ec2Service(AwsBase):
             self.pool.add_task(worker, item=region)
 
         # Wait results
-        if return_first: self.pool.wait_results(results)
-        else: self.pool.wait_completion()
-
-        self.change_region(curRegion)
+        self.pool.wait_completion()
         return results
 
     def get_instances(self, regions=[]):

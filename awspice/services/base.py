@@ -50,33 +50,38 @@ class AwsBase(object):
         Returns:
             None
         '''
-        # 1. Validate args for authentication
-        self.set_auth_config(region=AwsBase.region,
-                             profile=AwsBase.profile,
-                             access_key=AwsBase.access_key,
-                             secret_key=AwsBase.secret_key)
-        # 2. Set Boto3 client
-        if AwsBase.profile:
-            self.client = boto3.Session(profile_name=AwsBase.profile).client(service, region_name=AwsBase.region)
-            if service in self.service_resources:
-                self.resource = boto3.Session(profile_name=AwsBase.profile).resource(
-                    service, region_name=AwsBase.region)
+        _region = str(AwsBase.region)
+        _profile = str(AwsBase.profile) if AwsBase.profile else None
+        _access_key = str(AwsBase.access_key) if AwsBase.access_key else None
+        _secret_key = str(AwsBase.secret_key) if AwsBase.secret_key else None
 
-        elif AwsBase.access_key and AwsBase.secret_key:
+        # 1. Validate args for authentication
+        self.set_auth_config(region=_region,
+                             profile=_profile,
+                             access_key=_access_key,
+                             secret_key=_secret_key)
+        # 2. Set Boto3 client
+        if _profile:
+            self.client = boto3.Session(profile_name=_profile).client(service, region_name=_region)
+            if service in self.service_resources:
+                self.resource = boto3.Session(profile_name=_profile).resource(
+                    service, region_name=_region)
+
+        elif _access_key and _secret_key:
             self.client = boto3.client(service,
-                                    region_name=AwsBase.region,
-                                    aws_access_key_id=AwsBase.access_key,
-                                    aws_secret_access_key=AwsBase.secret_key)
+                                    region_name=_region,
+                                    aws_access_key_id=_access_key,
+                                    aws_secret_access_key=_secret_key)
             if service in self.service_resources:
                 self.resource = boto3.resource(service,
-                                            region_name=AwsBase.region,
-                                            aws_access_key_id=AwsBase.access_key,
-                                            aws_secret_access_key=AwsBase.secret_key)
+                                            region_name=_region,
+                                            aws_access_key_id=_access_key,
+                                            aws_secret_access_key=_secret_key)
         # If auth isn't provided, set "default" profile (.aws/credentials)
         else:
-            self.client = boto3.client(service, region_name=AwsBase.region)
+            self.client = boto3.client(service, region_name=_region)
             if service in self.service_resources:
-                self.resource = boto3.resource(service, region_name=AwsBase.region)
+                self.resource = boto3.resource(service, region_name=_region)
 
     @classmethod
     def set_auth_config(cls, region, profile=None, access_key=None, secret_key=None):
@@ -117,9 +122,9 @@ class AwsBase(object):
         _region_name = str(AwsBase.region)
         _region = dict(AwsBase.endpoints['Regions'][_region_name], RegionName=_region_name)
         _profile = str(AwsBase.profile)
-        _accesskey = str(AwsBase.access_key)
+        _access_key = str(AwsBase.access_key)
 
-        return {'region': _region, 'profile': _profile, 'access_key': _accesskey}
+        return {'region': _region, 'profile': _profile, 'access_key': _access_key}
 
 
 
@@ -144,7 +149,7 @@ class AwsBase(object):
         _region_name = client_conf['region']['RegionName'] if client_conf else str(AwsBase.region)
         _region_dict = client_conf['region'] if client_conf else dict(AwsBase.endpoints['Regions'][_region_name])
         _profile =     client_conf['profile'] if client_conf else str(AwsBase.profile)
-        _accesskey =   client_conf['access_key'] if client_conf else str(AwsBase.access_key)
+        _access_key =   client_conf['access_key'] if client_conf else str(AwsBase.access_key)
         results = []
 
         for element in elements:
@@ -158,8 +163,8 @@ class AwsBase(object):
 
             if _profile:
                 element['Authorization'] = {'Type':'Profile', 'Value': _profile}
-            elif _accesskey:
-                element['Authorization'] = {'Type':'AccessKeys', 'Value': _accesskey}
+            elif _access_key:
+                element['Authorization'] = {'Type':'AccessKeys', 'Value': _access_key}
             else:
                 element['Authorization'] = {'Type':'Profile', 'Value': 'default'}
 
@@ -418,6 +423,5 @@ class AwsBase(object):
         '''
         self.service = service
         self.set_client(service=service)
-        # TODO: Verify unnecesary iterations
         self._load_endpoints()
 
