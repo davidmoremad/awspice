@@ -2,6 +2,7 @@
 from awspice.services.base import AwsBase
 from botocore.exceptions import ClientError
 import StringIO
+import json
 
 class S3Service(AwsBase):
     '''
@@ -41,31 +42,29 @@ class S3Service(AwsBase):
         Returns:
             Buckets-ACL (list): List of dictionaries with the buckets requested
         '''
-        buckets = []
+        results = []
 
+        # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+        global_acl = 'http://acs.amazonaws.com/groups/global/AllUsers'
+        
         def worker(bucket):
             try:
+                bucket_result = {}
                 bucket_acl = self.client.get_bucket_acl(Bucket=bucket['Name'])
 
-                # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
-                global_acl = 'http://acs.amazonaws.com/groups/global/AllUsers'
-                permissions = ['READ', 'WRITE']
-                public_bucket = {}
-
                 for grant in bucket_acl['Grants']:
-                    if grant.get('Permission') in permissions and grant['Grantee'].get('URI') == global_acl:
-                        if public_bucket.get('Name'):
-                            public_bucket['Permissions'].append(grant['Permission'])
-                        else:
-                            public_bucket['Name'] = bucket['Name']
-                            public_bucket['Permissions'] = []
-                            public_bucket['Permissions'].append(grant['Permission'])
-
-                if public_bucket:
-                    buckets.append(public_bucket)
+                    if bucket['Name'] == 'hackforgood':print grant
+                    if grant['Grantee']['Type'].lower() == 'group' \
+                        and grant['Grantee']['URI'] == 'http://acs.amazonaws.com/groups/global/AllUsers':
+                        
+                        if not bucket_result: bucket_result = bucket
+                        bucket_result['Permissions'] = []
+                        bucket_result['Permissions'].append(grant['Permission'])
+                
+                if bucket_result: results.append(bucket_result)
 
             # AccessDenied getting GetBucketAcl
-            except ClientError as e: pass
+            except ClientError: pass
 
         # Launch tasks in threads
         for bucket in self.get_buckets():
@@ -73,11 +72,10 @@ class S3Service(AwsBase):
         # Wait results
         self.pool.wait_completion()
 
-        return self.inject_client_vars(buckets)
+        return self.inject_client_vars(results)
 
     def list_bucket_objects(self, bucket):
         return self.client.list_objects(Bucket=bucket)['Contents']
-
 
 
 

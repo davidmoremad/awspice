@@ -27,7 +27,7 @@ class AwsBase(object):
     secret_key = None
 
     # THREADS NUMBER
-    pool = ThreadPool(10)
+    pool = ThreadPool(30)
 
     service_resources = ['ec2', 's3']
 
