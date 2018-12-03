@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from awspice.helpers import ip_in_aws, dnsinfo_from_ip
+from awspice.helpers import dnsinfo_from_ip
 
 class FinderModule:
     '''
@@ -37,7 +37,7 @@ class FinderModule:
         regions = self.aws.ec2.parse_regions(regions, True)
         if not self._filters_validation(filter_key, filter_value, regions):
             return None
-            
+
         for account in profiles:
             self.aws.ec2.change_profile(account)
             instance = self.aws.ec2.get_instance_by(filter_key, filter_value, regions=regions)
