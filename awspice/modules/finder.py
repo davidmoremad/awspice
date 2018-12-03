@@ -134,6 +134,7 @@ class FinderModule:
             lock.acquire()
             self.aws.iam.change_profile(profile)
             lock.release()
+
             results.extend(self.aws.iam.get_users())
 
         for profile in profiles: self.aws.iam.pool.add_task(worker, profile)

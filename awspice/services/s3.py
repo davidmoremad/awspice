@@ -32,7 +32,9 @@ class S3Service(AwsBase):
         Returns:
             Buckets (list): List of dictionaries with the buckets requested
         '''
-        return self.inject_client_vars(self.client.list_buckets()['Buckets'])
+        config = self.get_client_vars()
+        buckets = self.client.list_buckets()['Buckets']
+        return self.inject_client_vars(buckets, config)
 
 
     def get_public_buckets(self):
@@ -66,13 +68,12 @@ class S3Service(AwsBase):
             # AccessDenied getting GetBucketAcl
             except ClientError: pass
 
-        # Launch tasks in threads
-        for bucket in self.get_buckets():
-            self.pool.add_task(worker, bucket=bucket)
-        # Wait results
+        config = self.get_client_vars()
+
+        for bucket in self.get_buckets(): self.pool.add_task(worker, bucket=bucket)
         self.pool.wait_completion()
 
-        return self.inject_client_vars(results)
+        return self.inject_client_vars(results, config)
 
     def list_bucket_objects(self, bucket):
         return self.client.list_objects(Bucket=bucket)['Contents']

@@ -15,12 +15,13 @@ class IamService(AwsBase):
         '''
         user_list = []
 
+        config = self.get_client_vars()
         paginator = self.client.get_paginator('list_users')
         for response in paginator.paginate():
             for user in response['Users']:
                 user_list.append(user)
 
-        return self.inject_client_vars(user_list)
+        return self.inject_client_vars(user_list, config)
 
     def __init__(self):
         AwsBase.__init__(self, 'iam')
