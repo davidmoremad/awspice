@@ -20,7 +20,7 @@ class IamService(AwsBase):
             for user in response['Users']:
                 user_list.append(user)
 
-        return user_list
+        return self.inject_client_vars(user_list)
 
     def __init__(self):
         AwsBase.__init__(self, 'iam')
