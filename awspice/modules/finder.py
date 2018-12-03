@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from awspice.helpers import dnsinfo_from_ip
+from threading import Lock
 
 class FinderModule:
     '''
@@ -121,7 +122,44 @@ class FinderModule:
                 results.extend(self.aws.elb.get_loadbalancers(regions=regions))
         return results
         
+    def find_users(self, profiles=[]):
+        '''
+        Search IAM users in different accounts.
+        '''
+        results = list()
+        profiles = self.aws.iam.parse_profiles(profiles)
+        lock = Lock()
+
+        def worker(profile):
+            lock.acquire()
+            self.aws.iam.change_profile(profile)
+            lock.release()
+            results.extend(self.aws.iam.get_users())
+
+        for profile in profiles: self.aws.iam.pool.add_task(worker, profile)
+        self.aws.iam.pool.wait_completion()
+
+        return results
         
+    def find_buckets(self, profiles=[]):
+        '''
+        Search S3 buckets in different accounts.
+        '''
+        results = list()
+        profiles = self.aws.s3.parse_profiles(profiles)
+        lock = Lock()
+
+        def worker(profile):
+            lock.acquire()
+            self.aws.s3.change_profile(profile)
+            lock.release()
+            results.extend(self.aws.s3.get_buckets())
+
+        for profile in profiles: self.aws.s3.pool.add_task(worker, profile)
+        self.aws.s3.pool.wait_completion()
+
+        return results
+
 
     def __init__(self, aws):
         self.aws = aws

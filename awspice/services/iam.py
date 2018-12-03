@@ -16,7 +16,6 @@ class IamService(AwsBase):
         user_list = []
 
         paginator = self.client.get_paginator('list_users')
-
         for response in paginator.paginate():
             for user in response['Users']:
                 user_list.append(user)
