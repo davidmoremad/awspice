@@ -16,7 +16,7 @@ class Worker(Thread):
         self.tasks = tasks
         self.daemon = True
         self.start()
-    
+
     def run(self):
         while True:
             func, args, kargs = self.tasks.get()
@@ -40,7 +40,7 @@ class ThreadPool:
     def wait_completion(self):
         """Wait for completion of all the tasks in the queue"""
         self.tasks.join()
-        
+
 
 class ClsEncoder(json.JSONEncoder):
     '''
@@ -66,7 +66,7 @@ def ip_in_aws(ip):
     Check if an IP address is from AWS
 
     Arguments:
-        ip: Address to check 
+        ip: Address to check
 
     Returns:
         bool

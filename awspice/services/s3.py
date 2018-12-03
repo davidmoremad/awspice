@@ -2,7 +2,6 @@
 from awspice.services.base import AwsBase
 from botocore.exceptions import ClientError
 import StringIO
-import json
 
 class S3Service(AwsBase):
     '''
@@ -48,7 +47,7 @@ class S3Service(AwsBase):
 
         # https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
         global_acl = 'http://acs.amazonaws.com/groups/global/AllUsers'
-        
+
         def worker(bucket):
             try:
                 bucket_result = {}
@@ -57,7 +56,7 @@ class S3Service(AwsBase):
                 for grant in bucket_acl['Grants']:
                     if bucket['Name'] == 'hackforgood':print grant
                     if grant['Grantee']['Type'].lower() == 'group' \
-                        and grant['Grantee']['URI'] == 'http://acs.amazonaws.com/groups/global/AllUsers':
+                        and grant['Grantee']['URI'] == global_acl:
                         
                         if not bucket_result: bucket_result = bucket
                         bucket_result['Permissions'] = []
