@@ -1,3 +1,4 @@
+from threading import Lock
 
 volume_filters = {
     'id': 'volume-id',
@@ -7,20 +8,29 @@ volume_filters = {
 
 
 def _extract_volumes(self, filters=[], regions=[], return_first=False):
-    results = list()
-
     regions = self.parse_regions(regions)
-    for region in regions:
+    results = dict() if return_first else list()
+    lock = Lock()
+    
+    def worker(region):
+        lock.acquire()
         self.change_region(region['RegionName'])
+        config = self.get_client_vars()
+        lock.release()
 
         volumes = self.client.describe_volumes(Filters=filters)['Volumes']
-        volumes = self.inject_client_vars(volumes)
+        volumes = self.inject_client_vars(volumes, config)
 
         if return_first and volumes:
-            self.change_region(curRegion)
-            return volumes[0]
+            results.update(volumes[0])
+        if not return_first and volumes:
+            results.extend(volumes)
 
-        results.extend(volumes)
+    # Launch tasks in threads
+    for region in regions: self.pool.add_task(worker, region=region)
+
+    # Wait results
+    self.pool.wait_completion()
 
     return results
 

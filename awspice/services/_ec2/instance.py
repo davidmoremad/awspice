@@ -16,13 +16,13 @@ instance_filters = {
 def _extract_instances(self, filters=[], regions=[], return_first=False):
     regions = self.parse_regions(regions)
     results = dict() if return_first else list()
-
     lock = Lock()
-    def worker(item):
+
+    def worker(region):
         # Race Condition: Locking AwsBase.region...
         # Change region > Get client config > Do the query
         lock.acquire()
-        self.change_region(item['RegionName'])
+        self.change_region(region['RegionName'])
         config = self.get_client_vars()
         lock.release()
 
@@ -36,11 +36,11 @@ def _extract_instances(self, filters=[], regions=[], return_first=False):
                 results.extend(instances)
 
     # Launch tasks in threads
-    for region in regions:
-        self.pool.add_task(worker, item=region)
+    for region in regions: self.pool.add_task(worker, region=region)
 
     # Wait results
     self.pool.wait_completion()
+    
     return results
 
 def get_instances(self, regions=[]):
