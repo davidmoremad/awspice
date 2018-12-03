@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from base import AwsBase
+from threading import Lock
 import dns.resolver
 
 
@@ -48,11 +49,19 @@ class ElbService(AwsBase):
         '''
         results = list()
         regions = self.parse_regions(regions=regions)
-        for region in regions:
+        lock = Lock()
+        
+        def worker(region):
+            lock.acquire()
             self.change_region(region['RegionName'])
-
+            config = self.get_client_vars()
+            lock.release()
             elbs = self.client.describe_load_balancers()['LoadBalancerDescriptions']
-            results.extend(self.inject_client_vars(elbs))
+            results.extend(self.inject_client_vars(elbs, config))
+
+        for region in regions:
+            self.pool.add_task(worker, region)
+        self.pool.wait_completion()
 
         return results
 
