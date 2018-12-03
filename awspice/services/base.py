@@ -146,10 +146,17 @@ class AwsBase(object):
         '''
 
         # [!] used dict() to avoid to rewrite object AwsBase in next line
-        _region_name = client_conf['region']['RegionName'] if client_conf else str(AwsBase.region)
-        _region_dict = client_conf['region'] if client_conf else dict(AwsBase.endpoints['Regions'][_region_name])
-        _profile =     client_conf['profile'] if client_conf else str(AwsBase.profile)
-        _access_key =   client_conf['access_key'] if client_conf else str(AwsBase.access_key)
+        if client_conf:
+            _region_name = client_conf['region']['RegionName']
+            _region_dict = client_conf['region']
+            _profile =     client_conf['profile']
+            _access_key =  client_conf['access_key']
+        else:
+            _region_name = str(AwsBase.region)
+            _region_dict = dict(AwsBase.endpoints['Regions'][_region_name])
+            _profile =     str(AwsBase.profile)
+            _access_key =  str(AwsBase.access_key)
+            _region_dict['RegionName'] = _region_name
         results = []
 
         for element in elements:
