@@ -141,7 +141,20 @@ class FinderModule:
         self.aws.iam.pool.wait_completion()
 
         return results
-        
+
+
+    def find_inactive_users(self, profiles=[]):
+        results = []
+        profiles = self.aws.iam.parse_profiles(profiles)
+
+        for profile in profiles:
+            self.aws.iam.change_profile(profile)
+            results.extend(self.aws.iam.get_inactive_users())
+
+        return results
+
+
+
     def find_buckets(self, profiles=[]):
         '''
         Search S3 buckets in different accounts.
