@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from awspice.helpers import dnsinfo_from_ip
+from awspice.helpers import extract_region_from_ip
 from threading import Lock
 
 class FinderModule:
@@ -11,43 +11,30 @@ class FinderModule:
 
     '''
 
-    def _filters_validation(self, filter_key, filter_value, regions):
-        '''
-        Check some previous test to filters before do the main action.
-
-        Args:
-            filter_key (str)
-            filter_value (str)
-
-        Return:
-            bool: True if filters are validated
-        '''
-        result = True
-
-        if filter_key == 'publicip':
-            hostname = dnsinfo_from_ip(filter_value)
-            result = bool(hostname) and self.aws.ec2.region_in_regions(hostname['region'], regions)
-
-        return result
-
     def find_instance(self, filter_key, filter_value, profiles=[], regions=[]):
         '''
-        Searches for an instance in different accounts and regions, using search filters.
+        Get an instance in different accounts and regions, using search filters.
         '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
-        if not self._filters_validation(filter_key, filter_value, regions):
-            return None
+
+        # CODE SNIPPET from aws.service.ec2.instances.get_instance_by
+        if filter_key == "publicip":
+            ip_in_aws, ip_region = extract_region_from_ip(filter_value)
+            if not ip_in_aws: return {}
+            if regions and (ip_region in regions or ip_region in regions.keys()):
+                regions = ip_region
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
             instance = self.aws.ec2.get_instance_by(filter_key, filter_value, regions=regions)
             if instance: return instance
-        return None
+                
+        return {}
 
     def find_instances(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
         '''
-        Searches for a group of instances in different accounts and regions, using search filters.
+        Get instances in different accounts and regions, using search filters.
         '''
         results = list()
         profiles = self.aws.ec2.parse_profiles(profiles)
@@ -64,7 +51,7 @@ class FinderModule:
 
     def find_volume(self, filter_key, filter_value, profiles=[], regions=[]):
         '''
-        Searches for an volume in different accounts and regions, using search filters.
+        Get a volume in different accounts and regions, using search filters.
         '''
         profiles = self.aws.ec2.parse_profiles(profiles)
         regions = self.aws.ec2.parse_regions(regions, True)
@@ -77,7 +64,7 @@ class FinderModule:
 
     def find_volumes(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
         '''
-        Searches for a group of volumes in different accounts and regions, using search filters.
+        Get group of volumes in different accounts and regions, using search filters.
         '''
         results = list()
         profiles = self.aws.ec2.parse_profiles(profiles)
@@ -94,7 +81,7 @@ class FinderModule:
 
     def find_loadbalancer(self, filter_key, filter_value, profiles=[], regions=[]):
         '''
-        Searches for a load balancer in different accounts and regions, using search filters.
+        Get a load balancer in different accounts and regions, using search filters.
         '''
         profiles = self.aws.elb.parse_profiles(profiles)
         regions = self.aws.elb.parse_regions(regions, True)
@@ -108,7 +95,7 @@ class FinderModule:
 
     def find_loadbalancers(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
         '''
-        Searches for a load balancers in different accounts and regions, using search filters.
+        Get load balancers in different accounts and regions, using search filters.
         '''
         results = list()
         profiles = self.aws.elb.parse_profiles(profiles)
@@ -124,7 +111,7 @@ class FinderModule:
         
     def find_users(self, profiles=[]):
         '''
-        Search IAM users in different accounts.
+        Get IAM users in different accounts.
         '''
         results = list()
         profiles = self.aws.iam.parse_profiles(profiles)
@@ -144,6 +131,11 @@ class FinderModule:
 
 
     def find_inactive_users(self, profiles=[]):
+        '''
+        Get inactive users in different accounts
+        '''
+
+
         results = []
         profiles = self.aws.iam.parse_profiles(profiles)
 

@@ -4,8 +4,8 @@ Services
 
 
 
-ACM - Certificate
------------------
+ACM
+---
 
 .. autosummary::
 
@@ -15,8 +15,8 @@ ACM - Certificate
 
 
 
-CE  - Cost explorer
--------------------
+CE
+--
 
 .. autosummary::
 
@@ -24,8 +24,8 @@ CE  - Cost explorer
 
 
 
-EC2 - Compute
--------------
+EC2
+---
 
 .. autosummary::
 
@@ -58,8 +58,8 @@ EC2 - Compute
 
 
 
-ELB - Balancing
----------------
+ELB
+---
 
 .. autosummary::
 
@@ -69,8 +69,8 @@ ELB - Balancing
 
 
 
-IAM - Users & Access
---------------------
+IAM
+---
 
 .. autosummary::
 
@@ -79,8 +79,8 @@ IAM - Users & Access
 
 
 
-RDS - Databases
----------------
+RDS
+---
 
 .. autosummary::
 

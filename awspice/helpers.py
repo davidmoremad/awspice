@@ -73,6 +73,26 @@ def ip_in_aws(ip):
     '''
     return bool(dnsinfo_from_ip(ip))
 
+
+def extract_region_from_ip(ip):
+    '''Get the region where a IP is located and if it's on AWS
+
+    Args:
+        ip (str): IP address 
+    
+    Returns:
+        (bool, str): It's in AWS / Region where the IP is located
+    '''
+    hostname = dnsinfo_from_ip(ip)
+
+    if hostname:
+        region = hostname['region']
+        return (True, region) if region else (True, '')
+    else:
+        return (False, None)
+
+
+
 def dnsinfo_from_ip(ip):
     '''
     Returns the DNS name of an IP address

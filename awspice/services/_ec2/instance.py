@@ -1,5 +1,5 @@
 from threading import Lock
-from awspice.helpers import dnsinfo_from_ip
+from awspice.helpers import extract_region_from_ip
 
 instance_filters = {
     'id': 'instance-id',
@@ -90,16 +90,12 @@ def get_instances_by(self, filter_key, filter_value, regions=[], return_first=Fa
         'Values': [filter_value]
     }]
     
-    # The DNS name of instance autoassigned IPs has this format: region.service.amazonaws.com. (Not for Elastic IPs)
-    if (filter_key == 'publicip'):
-        hostname = dnsinfo_from_ip(filter_value)
-        # IP not in AWS
-        if not hostname: return results
-        
-        # Region in DNSName
-        if (hostname['region']) and (hostname['region'] in regions or hostname['region'] in map(lambda x: x['RegionName'],regions)):
-            regions = [hostname['region']]
-    
+    if filter_key == "publicip":
+        ip_in_aws, ip_region = extract_region_from_ip(filter_value)
+        if not ip_in_aws: return results
+        if regions and (ip_region in regions or ip_region in regions.keys()):
+            regions = ip_region
+
     results = self._extract_instances(filters=filters, regions=regions, return_first=return_first)
     return results
 

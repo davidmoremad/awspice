@@ -16,11 +16,9 @@ Finder
    awspice.modules.finder.FinderModule.find_volumes
    awspice.modules.finder.FinderModule.find_loadbalancer
    awspice.modules.finder.FinderModule.find_loadbalancers
-   awspice.modules.finder.FinderModule.find_users
-   awspice.modules.finder.FinderModule.worker
-   awspice.modules.finder.FinderModule.find_inactive_users
    awspice.modules.finder.FinderModule.find_buckets
-   awspice.modules.finder.FinderModule.worker
+   awspice.modules.finder.FinderModule.find_users
+   awspice.modules.finder.FinderModule.find_inactive_users
 
 
 
