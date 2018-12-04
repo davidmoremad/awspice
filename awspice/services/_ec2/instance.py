@@ -1,5 +1,5 @@
 from threading import Lock
-
+from awspice.helpers import dnsinfo_from_ip
 
 instance_filters = {
     'id': 'instance-id',
