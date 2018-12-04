@@ -66,6 +66,17 @@ class ElbService(AwsBase):
         return results
 
     def get_loadbalancers_by(self, filter_key, filter_value, regions=[]):
+        '''Get loadbalancers which match with the filters
+        
+        Args:
+            filter_key (str): [description]
+            filter_value (str): [description]
+            regions (list, optional): Defaults to []. List of regions to search in
+        
+        Returns:
+            list: List of load balancers requested
+        '''
+
         results = list()
         if filter_key == 'tagname':
             for region in self.parse_regions(regions=regions):

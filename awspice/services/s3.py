@@ -37,8 +37,11 @@ class S3Service(AwsBase):
 
 
     def get_public_buckets(self):
-        '''
-        Get all public readable or writable buckets in S3
+        '''Get all public buckets and its permissions
+        
+        This method returns all buckets in an AWS Account which
+        have public permissions to read, write, read acl, write acl or
+        even full control.
 
         Returns:
             Buckets-ACL (list): List of dictionaries with the buckets requested
@@ -75,6 +78,15 @@ class S3Service(AwsBase):
         return self.inject_client_vars(results, config)
 
     def list_bucket_objects(self, bucket):
+        '''List objects stored in a bucket
+        
+        Args:
+            bucket (str): Name of the bucket
+        
+        Returns:
+            list: List of bucket objects
+        '''
+
         return self.client.list_objects(Bucket=bucket)['Contents']
 
 
