@@ -69,24 +69,6 @@ The client is built and configured using ``awspice.connect()``. This method indi
   aws = awspice.connect('us-west-2', access_key='AKIA***********', secret_key='/HR$4************')
 
 
-------------------------------------------------------------------------------------------
-
-.. test-section
-
-*******
-Test it
-*******
-
-To verify that the configuration has been correctly stored, you can run the following test.
-This test only checks that your user is registered and enabled on the AWS account set in the client's configuration.
-
-.. code-block:: python
-
-  import awspice
-
-  aws = awspice.connect(profile='<YOUR_PROFILE>')
-  aws.test()
-
 
 
 ------------------------------------------------------------------------------------------
