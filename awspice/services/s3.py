@@ -86,9 +86,7 @@ class S3Service(AwsBase):
         Returns:
             list: List of bucket objects
         '''
-        results = []
-        results = self.client.list_objects(Bucket=bucket)['Contents']
-        return results
+        return self.client.list_objects(Bucket=bucket).get('Contents', [])
         
 
 
