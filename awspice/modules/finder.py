@@ -165,6 +165,19 @@ class FinderModule:
         self.aws.s3.pool.wait_completion()
 
         return results
+        
+    def find_databases(self, profiles=[], regions=[]):
+        '''
+        Get RDS databases in different accounts and regions.
+        '''
+        results = list()
+        profiles = self.aws.ec2.parse_profiles(profiles)
+        regions = self.aws.ec2.parse_regions(regions, True)
+
+        for account in profiles:
+            self.aws.rds.change_profile(account)
+            results.extend(self.aws.rds.get_rdss(regions))
+        return results
 
 
     def __init__(self, aws):
