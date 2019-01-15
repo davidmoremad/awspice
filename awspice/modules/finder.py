@@ -166,7 +166,7 @@ class FinderModule:
 
         return results
         
-    def find_databases(self, profiles=[], regions=[]):
+    def find_rds_databases(self, profiles=[], regions=[]):
         '''
         Get RDS databases in different accounts and regions.
         '''
@@ -177,6 +177,19 @@ class FinderModule:
         for account in profiles:
             self.aws.rds.change_profile(account)
             results.extend(self.aws.rds.get_rdss(regions))
+        return results
+        
+    def find_rds_snapshots(self, profiles=[], regions=[]):
+        '''
+        Get RDS snapshots in different accounts and regions.
+        '''
+        results = list()
+        profiles = self.aws.ec2.parse_profiles(profiles)
+        regions = self.aws.ec2.parse_regions(regions, True)
+
+        for account in profiles:
+            self.aws.rds.change_profile(account)
+            results.extend(self.aws.rds.get_snapshots(regions))
         return results
 
 

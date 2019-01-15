@@ -19,6 +19,8 @@ Finder
    awspice.modules.finder.FinderModule.find_buckets
    awspice.modules.finder.FinderModule.find_users
    awspice.modules.finder.FinderModule.find_inactive_users
+   awspice.modules.finder.FinderModule.find_rds_databases
+   awspice.modules.finder.FinderModule.find_rds_snapshots
 
 
 

@@ -85,7 +85,7 @@ RDS
 .. autosummary::
 
    awspice.services.rds.RdsService.get_rdss
-
+   awspice.services.rds.RdsService.get_snapshots
 
 
 S3
