@@ -92,9 +92,20 @@ def get_instances_by(self, filter_key, filter_value, regions=[], return_first=Fa
     
     if filter_key == "publicip":
         ip_in_aws, ip_region = extract_region_from_ip(filter_value)
-        if not ip_in_aws: return results
-        if regions and (ip_region in regions or ip_region in regions.keys()):
-            regions = ip_region
+        
+        if not ip_in_aws:
+            return {}
+
+        # ['eu-west-1', 'eu-west-2']    / 'eu-west-1'
+        # [ {'RegionName': 'eu-west-1'}, {...} ]
+        if isinstance(regions, list):
+            if ip_region in regions or ip_region in regions[0].values():
+                region = ip_region
+                
+        # {'eu-west-1': {...}, 'eu-west-2': {...} }
+        if isinstance(regions, dict):
+            if ip_region in regions.keys():
+                region = ip_region
 
     results = self._extract_instances(filters=filters, regions=regions, return_first=return_first)
     return results
