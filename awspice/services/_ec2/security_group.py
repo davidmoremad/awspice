@@ -1,3 +1,4 @@
+from threading import Lock
 
 secgroup_filters = {
     'id': 'group-id',
@@ -9,17 +10,42 @@ secgroup_filters = {
     'range': 'ip-permission.cidr',
 }
 
+def _extract_secgroups(self, filters=[], regions=[], return_first=False):
+    regions = self.parse_regions(regions)
+    results = dict() if return_first else list()
+    lock = Lock()
 
-def get_secgroups(self):
+    def worker(region):
+        lock.acquire()
+        self.change_region(region['RegionName'])
+        config = self.get_client_vars()
+        lock.release()
+
+        secgroups = self.client.describe_security_groups(Filters=filters)["SecurityGroups"]
+
+        if secgroups:
+            secgroups = self.inject_client_vars(secgroups, config)
+
+            if return_first:
+                results.update(secgroups[0])
+            if not return_first:
+                results.extend(secgroups)
+
+    for region in regions: self.pool.add_task(worker, region=region)
+    self.pool.wait_completion()
+    
+    return results
+
+def get_secgroups(self, regions=[]):
     '''
     Get all security groups for the current region
 
     Returns:
         SecurityGroups (lst): List of dictionaries with the security groups requested
     '''
-    return self.inject_client_vars(self.client.describe_security_groups()['SecurityGroups'])
+    return self._extract_secgroups(regions=regions)
 
-def get_secgroup_by(self, filters):
+def get_secgroup_by(self, filters, regions=[]):
     '''
     Get security group for a region that matches with filters
 
@@ -30,12 +56,11 @@ def get_secgroup_by(self, filters):
     Returns:
         SecurityGroup (dict): Dictionaries with the security group requested
     '''
-    secgroup = self.get_secgroups_by(filters)
-    if secgroup:
-        return self.inject_client_vars(secgroup)[0]
-    return None
+    self.validate_filters(filters, self.secgroup_filters)
+    formatted_filters = [{'Name': self.secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
+    return self._extract_secgroups(filters=formatted_filters, regions=regions, return_first=True)
 
-def get_secgroups_by(self, filters):
+def get_secgroups_by(self, filters, regions=[]):
     '''
     Get all security groups for a region that matches with filters
 
@@ -48,9 +73,7 @@ def get_secgroups_by(self, filters):
     '''
     self.validate_filters(filters, self.secgroup_filters)
     formatted_filters = [{'Name': self.secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
-
-    secgroups = self.client.describe_security_groups(Filters=formatted_filters)['SecurityGroups']
-    return self.inject_client_vars(secgroups)
+    return self._extract_secgroups(filters=formatted_filters, regions=regions)
 
 def create_security_group(self, name, allowed_range, vpc_id=None):
     '''

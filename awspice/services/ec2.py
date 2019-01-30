@@ -97,6 +97,7 @@ class Ec2Service(AwsBase):
     # #################################
     from _ec2.security_group import secgroup_filters
 
+    from _ec2.security_group import _extract_secgroups
     from _ec2.security_group import get_secgroups
     from _ec2.security_group import get_secgroup_by
     from _ec2.security_group import get_secgroups_by
