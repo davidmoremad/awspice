@@ -3,6 +3,9 @@ ami_filters = {
     'name': 'name',
     'architecture': 'architecture',
     'platform': 'platform',
+    'owner': 'owner-id',
+    'public': 'is-public',
+    'state': 'state',
 }
 
 ami_distributions = {
@@ -71,7 +74,7 @@ def get_amis_by_distribution(self, distrib, version='*', latest=False, regions=[
 
     return results
 
-def get_ami_by(self, filter_key, filter_value, regions=[]):
+def get_ami_by(self, filters, regions=[]):
     '''
     Get an ami for one or more regions that matches with filter
 
@@ -83,12 +86,11 @@ def get_ami_by(self, filter_key, filter_value, regions=[]):
     Return:
         Image (dict): Image requested
     '''
-    return self.get_amis_by(filter_key=filter_key,
-                            filter_value=filter_value,
+    return self.get_amis_by(filters=filters,
                             regions=regions,
                             return_first=True)
 
-def get_amis_by(self, filter_key, filter_value, regions=[], return_first=False):
+def get_amis_by(self, filters, regions=[], return_first=False):
     '''
     Get list of amis for one or more regions that matches with filter
 
@@ -102,14 +104,10 @@ def get_amis_by(self, filter_key, filter_value, regions=[], return_first=False):
         Images (lst): List of requested images
     '''
 
-    self.validate_filters(filter_key, self.ami_filters)
+    self.validate_filters(filters, self.ami_filters)
+    formatted_filters = [{'Name': ami_filters[k], 'Values': [v]} for k, v in filters.items()]
 
-    filters = [{
-        'Name': self.ami_filters[filter_key],
-        'Values': [filter_value]
-    }]
-
-    return self._extract_amis(filters=filters, regions=regions, return_first=return_first)
+    return self._extract_amis(filters=formatted_filters, regions=regions, return_first=return_first)
     
 def get_amis(self, regions=[]):
     '''

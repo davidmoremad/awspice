@@ -11,7 +11,7 @@ class FinderModule:
 
     '''
 
-    def find_instance(self, filter_key, filter_value, profiles=[], regions=[]):
+    def find_instance(self, filters, profiles=[], regions=[]):
         '''
         Get an instance in different accounts and regions, using search filters.
         '''
@@ -19,9 +19,9 @@ class FinderModule:
         regions = self.aws.ec2.parse_regions(regions, True)
 
         # CODE SNIPPET from aws.service.ec2.instances.get_instance_by
-        if filter_key == "publicip":
-            ip_in_aws, ip_region = extract_region_from_ip(filter_value)
-
+        if "publicip" in filters.keys():
+            ip_in_aws, ip_region = extract_region_from_ip(filters['publicip'])
+            
             if not ip_in_aws:
                 return {}
 
@@ -39,12 +39,12 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            instance = self.aws.ec2.get_instance_by(filter_key, filter_value, regions=regions)
+            instance = self.aws.ec2.get_instance_by(filters, regions=regions)
             if instance: return instance
                 
         return {}
 
-    def find_instances(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
+    def find_instances(self, filters=None, profiles=[], regions=[]):
         '''
         Get instances in different accounts and regions, using search filters.
         '''
@@ -55,13 +55,13 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            if filter_key and filter_value:
-                results.extend(self.aws.ec2.get_instances_by(filter_key, filter_value, regions=regions))
+            if filters:
+                results.extend(self.aws.ec2.get_instances_by(filters, regions=regions))
             else:
                 results.extend(self.aws.ec2.get_instances(regions=regions))
         return results
 
-    def find_volume(self, filter_key, filter_value, profiles=[], regions=[]):
+    def find_volume(self, filters, profiles=[], regions=[]):
         '''
         Get a volume in different accounts and regions, using search filters.
         '''
@@ -70,11 +70,11 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            volume = self.aws.ec2.get_volume_by(filter_key, filter_value, regions=regions)
+            volume = self.aws.ec2.get_volume_by(filters, regions=regions)
             if volume: return volume
         return None
 
-    def find_volumes(self, filter_key=None, filter_value=None, profiles=[], regions=[]):
+    def find_volumes(self, filters=None, profiles=[], regions=[]):
         '''
         Get group of volumes in different accounts and regions, using search filters.
         '''
@@ -84,14 +84,14 @@ class FinderModule:
 
         for account in profiles:
             self.aws.ec2.change_profile(account)
-            if filter_key and filter_value:
-                results.extend(self.aws.ec2.get_volumes_by(filter_key, filter_value, regions=regions))
+            if filters:
+                results.extend(self.aws.ec2.get_volumes_by(filters, regions=regions))
             else:
                 results.extend(self.aws.ec2.get_volumes(regions=regions))
         return results
 
 
-    def find_loadbalancer(self, filter_key, filter_value, profiles=[], regions=[]):
+    def find_loadbalancer(self, filters, profiles=[], regions=[]):
         '''
         Get a load balancer in different accounts and regions, using search filters.
         '''
@@ -100,7 +100,7 @@ class FinderModule:
 
         for account in profiles:
             self.aws.elb.change_profile(account)
-            elb = self.aws.elb.get_loadbalancer_by(filter_key, filter_value, regions=regions)
+            elb = self.aws.elb.get_loadbalancer_by(filters, regions=regions)
             if elb: return elb
         return None
 

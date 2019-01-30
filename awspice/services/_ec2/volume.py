@@ -3,6 +3,9 @@ from threading import Lock
 volume_filters = {
     'id': 'volume-id',
     'status': 'status',
+    'instance': 'attachment.instance-id',
+    'autodelete': 'attachment.delete-on-termination',
+    'encrypted': 'encrypted',
     'tagname': 'tag:Name',
 }
 
@@ -46,7 +49,7 @@ def get_volumes(self, regions=[]):
     '''
     return self._extract_volumes(regions=regions)
 
-def get_volume_by(self, filter_key, filter_value, regions=[]):
+def get_volume_by(self, filters, regions=[]):
     '''
     Get a volume for one or more regions that matches with filters
 
@@ -58,9 +61,9 @@ def get_volume_by(self, filter_key, filter_value, regions=[]):
     Returns:
         Volume (dict): Dictionary with the volume requested
     '''
-    return self.get_volumes_by(filter_key, filter_value, regions, return_first=True)
+    return self.get_volumes_by(filters, regions, return_first=True)
 
-def get_volumes_by(self, filter_key, filter_value, regions=[], return_first=False):
+def get_volumes_by(self, filters, regions=[], return_first=False):
     '''
     Get volumes for one or more regions that matches with filters
 
@@ -72,12 +75,8 @@ def get_volumes_by(self, filter_key, filter_value, regions=[], return_first=Fals
     Returns:
         Volume (dict): Dictionary with the volume requested
     '''
-    self.validate_filters(filter_key, self.instance_filters)
-
-    filters = [{
-        'Name': self.volume_filters[filter_key],
-        'Values': [filter_value]
-    }]
+    self.validate_filters(filters, self.volume_filters)
+    filters = [{'Name': volume_filters[k], 'Values': [v]} for k,v in filters.items()]
 
     return self._extract_volumes(filters=filters, regions=regions, return_first=return_first)
 

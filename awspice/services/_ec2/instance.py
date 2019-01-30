@@ -55,7 +55,7 @@ def get_instances(self, regions=[]):
     '''
     return self._extract_instances(regions=regions)
 
-def get_instance_by(self, filter_key, filter_value, regions=[]):
+def get_instance_by(self, filters, regions=[]):
     '''
     Get an instance for one or more regions that matches with filter
 
@@ -67,9 +67,9 @@ def get_instance_by(self, filter_key, filter_value, regions=[]):
     Return:
         Instance (dict): Dictionary with the instance requested
     '''
-    return self.get_instances_by(filter_key, filter_value, regions, return_first=True)
+    return self.get_instances_by(filters, regions, return_first=True)
 
-def get_instances_by(self, filter_key, filter_value, regions=[], return_first=False):
+def get_instances_by(self, filters, regions=[], return_first=False):
     '''
     Get an instance for one or more regions that matches with filter
 
@@ -84,14 +84,11 @@ def get_instances_by(self, filter_key, filter_value, regions=[], return_first=Fa
     '''
     results = []
 
-    self.validate_filters(filter_key, self.instance_filters)
-    filters = [{
-        'Name': self.instance_filters[filter_key],
-        'Values': [filter_value]
-    }]
+    self.validate_filters(filters, self.instance_filters)
+    formatted_filters = [{'Name': self.instance_filters[k], 'Values': [v]} for k, v in filters.items()]
     
-    if filter_key == "publicip":
-        ip_in_aws, ip_region = extract_region_from_ip(filter_value)
+    if "publicip" in filters.keys():
+        ip_in_aws, ip_region = extract_region_from_ip(filters['publicip'])
         
         if not ip_in_aws:
             return {}
@@ -107,7 +104,7 @@ def get_instances_by(self, filter_key, filter_value, regions=[], return_first=Fa
             if ip_region in regions.keys():
                 region = ip_region
 
-    results = self._extract_instances(filters=filters, regions=regions, return_first=return_first)
+    results = self._extract_instances(filters=formatted_filters, regions=regions, return_first=return_first)
     return results
 
 def create_instances(self, name, key_name, allowed_range, ami=None, distribution=None,

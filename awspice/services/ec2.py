@@ -111,6 +111,7 @@ class Ec2Service(AwsBase):
 
     from _ec2.address import _extract_addresses
     from _ec2.address import get_addresses
+    from _ec2.address import get_addresses_by
     from _ec2.address import get_address_by
     
 

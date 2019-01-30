@@ -196,13 +196,13 @@ class AwsBase(object):
         return self.parse_regions(region)[0] in self.parse_regions(regions)
 
     @classmethod
-    def validate_filters(cls, filter_key, filters_list):
+    def validate_filters(cls, input_filters, accepted_filters):
         '''
         Validate that an item is within a list
 
         Args:
-            filter_key (str): Item to validate
-            filters_list (list): Pre-validated list
+            input_filters (str): Items to validate
+            accepted_filters (list): Pre-validated list
 
         Returns:
             None
@@ -210,8 +210,9 @@ class AwsBase(object):
         Raises:
             ValueError: Filter is not in the accepted filter list
         '''
-        if filter_key not in filters_list:
-            raise ValueError('Invalid filter key. Allowed filters: ' + str(filters_list.keys()))
+        for filter_key in input_filters.keys():
+            if filter_key not in accepted_filters:
+                raise ValueError('Invalid filter key. Allowed filters: ' + str(accepted_filters.keys()))
 
 
     # #################################

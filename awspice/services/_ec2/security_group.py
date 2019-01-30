@@ -19,7 +19,7 @@ def get_secgroups(self):
     '''
     return self.inject_client_vars(self.client.describe_security_groups()['SecurityGroups'])
 
-def get_secgroup_by(self, filter_key, filter_value):
+def get_secgroup_by(self, filters):
     '''
     Get security group for a region that matches with filters
 
@@ -30,12 +30,12 @@ def get_secgroup_by(self, filter_key, filter_value):
     Returns:
         SecurityGroup (dict): Dictionaries with the security group requested
     '''
-    secgroup = self.get_secgroups_by(filter_key, filter_value)
+    secgroup = self.get_secgroups_by(filters)
     if secgroup:
         return self.inject_client_vars(secgroup)[0]
     return None
 
-def get_secgroups_by(self, filter_key, filter_value):
+def get_secgroups_by(self, filters):
     '''
     Get all security groups for a region that matches with filters
 
@@ -46,13 +46,10 @@ def get_secgroups_by(self, filter_key, filter_value):
     Returns:
         SecurityGroups (lst): List of dictionaries with the security groups requested
     '''
-    self.validate_filters(filter_key, self.secgroup_filters)
-    filters = [{
-        'Name': self.secgroup_filters[filter_key],
-        'Values': [filter_value]
-    }]
+    self.validate_filters(filters, self.secgroup_filters)
+    formatted_filters = [{'Name': secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
 
-    secgroups = self.client.describe_security_groups(Filters=filters)['SecurityGroups']
+    secgroups = self.client.describe_security_groups(Filters=formatted_filters)['SecurityGroups']
     return self.inject_client_vars(secgroups)
 
 def create_security_group(self, name, allowed_range, vpc_id=None):

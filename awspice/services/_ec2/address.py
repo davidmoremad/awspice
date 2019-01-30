@@ -1,7 +1,9 @@
 
 address_filters = {
     'publicip': 'public-ip',
-    'privateip': 'private-ip-address'
+    'privateip': 'private-ip-address',
+    'domain': 'domain',
+    'instance': 'instance-id'
 }
 
 
@@ -35,7 +37,22 @@ def get_addresses(self, regions=[]):
     '''
     return self._extract_addresses(regions=regions)
 
-def get_address_by(self, filter_key, filter_value, regions=[]):
+def get_addresses_by(self, filters, regions=[]):
+    '''
+    Get all IP Addresses for a region
+
+    Args:
+        regions (lst): Regions where to look for this element
+
+    Returns:
+        Addresses (dict): List of dictionaries with the addresses requested
+    '''
+    self.validate_filters(filters, self.address_filters)
+    formatted_filters = [{'Name': address_filters[k], 'Values': [v]} for k, v in filters.items()]
+    
+    return self._extract_addresses(filters=formatted_filters, regions=regions)
+
+def get_address_by(self, filters, regions=[]):
     '''
     Get IP Addresses for a region that matches with filters
 
@@ -45,10 +62,8 @@ def get_address_by(self, filter_key, filter_value, regions=[]):
     Returns:
         Address (dict): Dictionary with the address requested
     '''
-    self.validate_filters(filter_key, self.address_filters)
-    filters = [{
-        'Name': self.address_filters[filter_key],
-        'Values': [filter_value]
-    }]
-    return self._extract_addresses(filters=filters, regions=regions, return_first=True)
+    self.validate_filters(filters, self.address_filters)
+    formatted_filters = [{'Name': address_filters[k], 'Values': [v]} for k, v in filters.items()]
+
+    return self._extract_addresses(filters=formatted_filters, regions=regions, return_first=True)
 
