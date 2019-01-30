@@ -1,7 +1,12 @@
 
 secgroup_filters = {
     'id': 'group-id',
+    'name': 'group-name',
     'description': 'description',
+    'protocol': 'egress.ip-permission.protocol',
+    'fromport': 'ip-permission.from-port',
+    'toport': 'ip-permission.to-port',
+    'range': 'ip-permission.cidr',
 }
 
 
