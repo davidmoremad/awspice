@@ -84,7 +84,8 @@ RDS
 
 .. autosummary::
 
-   awspice.services.rds.RdsService.get_rdss
+   awspice.services.rds.RdsService.get_database_by
+   awspice.services.rds.RdsService.get_databases
    awspice.services.rds.RdsService.get_snapshots
 
 

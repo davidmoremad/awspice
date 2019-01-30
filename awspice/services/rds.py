@@ -7,7 +7,46 @@ class RdsService(AwsBase):
     Class belonging to the Remote Database System service.
     '''
 
-    def get_rdss(self, regions=[]):
+    database_filters = {
+        'id': 'db-instance-id',
+        'cluster': 'db-cluster-id',
+    }
+
+    def _extract_databases(self, filters=[], regions=[], return_first=False):
+        results = dict() if return_first else list()
+        regions = self.parse_regions(regions=regions)
+        lock = Lock()
+        
+        def worker(region):
+            lock.acquire()
+            self.change_region(region['RegionName'])
+            config = self.get_client_vars()
+            lock.release()
+            
+            rdss = self.client.describe_db_instances(Filters=filters)['DBInstances']
+
+            if rdss:
+                rds = self.inject_client_vars(rdss, config)
+                if return_first:
+                    results.update(rdss[0])
+                else:
+                    results.extend(rdss)
+
+        for region in regions:
+            self.pool.add_task(worker, region)
+        self.pool.wait_completion()
+
+        return results
+
+
+    def get_database_by(self, filters, regions=[]):
+        self.validate_filters(filters, self.database_filters)
+        formatted_filters = [{'Name': self.database_filters[k], 'Values': [v]} for k, v in filters.items()]
+        return self._extract_databases(filters=formatted_filters, regions=regions, return_first=True)
+
+
+
+    def get_databases(self, regions=[]):
         '''
         Get RDS instances in regions
 
@@ -17,23 +56,7 @@ class RdsService(AwsBase):
         Returns:
             (list): List of RDS dicts
         '''
-        results = list()
-        regions = self.parse_regions(regions=regions)
-        lock = Lock()
-        
-        def worker(region):
-            lock.acquire()
-            self.change_region(region['RegionName'])
-            config = self.get_client_vars()
-            lock.release()
-            rdss = self.client.describe_db_instances()['DBInstances']
-            results.extend(self.inject_client_vars(rdss, config))
-
-        for region in regions:
-            self.pool.add_task(worker, region)
-        self.pool.wait_completion()
-
-        return results
+        return self._extract_databases(regions=regions)
 
     def get_snapshots(self, regions=[]):
         '''

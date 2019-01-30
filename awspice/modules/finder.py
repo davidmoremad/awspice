@@ -188,7 +188,7 @@ class FinderModule:
 
         for account in profiles:
             self.aws.rds.change_profile(account)
-            results.extend(self.aws.rds.get_rdss(regions))
+            results.extend(self.aws.rds.get_databases(regions))
         return results
         
     def find_rds_snapshots(self, profiles=[], regions=[]):

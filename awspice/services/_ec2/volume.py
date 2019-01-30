@@ -22,12 +22,13 @@ def _extract_volumes(self, filters=[], regions=[], return_first=False):
         lock.release()
 
         volumes = self.client.describe_volumes(Filters=filters)['Volumes']
-        volumes = self.inject_client_vars(volumes, config)
 
-        if return_first and volumes:
-            results.update(volumes[0])
-        if not return_first and volumes:
-            results.extend(volumes)
+        if volumes:
+            volumes = self.inject_client_vars(volumes, config)
+            if return_first:
+                results.update(volumes[0])
+            else:
+                results.extend(volumes)
 
     # Launch tasks in threads
     for region in regions: self.pool.add_task(worker, region=region)

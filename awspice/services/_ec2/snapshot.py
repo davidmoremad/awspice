@@ -45,7 +45,7 @@ def get_snapshots_by(self, filters):
         Snapshots (lst): List of dictionaries with the snapshots requested
     '''
     self.validate_filters(filters, self.snapshot_filters)
-    formatted_filters = [{'Name': snapshot_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = [{'Name': self.snapshot_filters[k], 'Values': [v]} for k, v in filters.items()]
 
     return self.inject_client_vars(self.client.describe_snapshots(Filters=formatted_filters)['Snapshots'])
 

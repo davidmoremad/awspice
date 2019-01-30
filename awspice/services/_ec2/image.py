@@ -105,7 +105,7 @@ def get_amis_by(self, filters, regions=[], return_first=False):
     '''
 
     self.validate_filters(filters, self.ami_filters)
-    formatted_filters = [{'Name': ami_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = [{'Name': self.ami_filters[k], 'Values': [v]} for k, v in filters.items()]
 
     return self._extract_amis(filters=formatted_filters, regions=regions, return_first=return_first)
     

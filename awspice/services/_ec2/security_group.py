@@ -47,7 +47,7 @@ def get_secgroups_by(self, filters):
         SecurityGroups (lst): List of dictionaries with the security groups requested
     '''
     self.validate_filters(filters, self.secgroup_filters)
-    formatted_filters = [{'Name': secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = [{'Name': self.secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
 
     secgroups = self.client.describe_security_groups(Filters=formatted_filters)['SecurityGroups']
     return self.inject_client_vars(secgroups)

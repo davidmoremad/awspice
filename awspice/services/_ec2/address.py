@@ -18,7 +18,6 @@ def _extract_addresses(self, filters=[], regions=[], return_first=False):
         addresses = self.inject_client_vars(addresses)
 
         if return_first and addresses:
-            self.change_region(curRegion)
             return addresses[0]
 
         results.extend(addresses)
@@ -48,7 +47,7 @@ def get_addresses_by(self, filters, regions=[]):
         Addresses (dict): List of dictionaries with the addresses requested
     '''
     self.validate_filters(filters, self.address_filters)
-    formatted_filters = [{'Name': address_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = [{'Name': self.address_filters[k], 'Values': [v]} for k, v in filters.items()]
     
     return self._extract_addresses(filters=formatted_filters, regions=regions)
 
@@ -63,7 +62,7 @@ def get_address_by(self, filters, regions=[]):
         Address (dict): Dictionary with the address requested
     '''
     self.validate_filters(filters, self.address_filters)
-    formatted_filters = [{'Name': address_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = [{'Name': self.address_filters[k], 'Values': [v]} for k, v in filters.items()]
 
     return self._extract_addresses(filters=formatted_filters, regions=regions, return_first=True)
 

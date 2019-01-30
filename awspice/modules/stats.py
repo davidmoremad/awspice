@@ -37,7 +37,7 @@ class StatsModule:
             data['Addresses'] = self.aws.ec2.get_addresses()
             data['Vpcs'] = self.aws.ec2.get_vpcs()
             data['LoadBalancers'] = self.aws.elb.get_loadbalancers()
-            data['Databases'] = self.aws.rds.get_rdss()
+            data['Databases'] = self.aws.rds.get_databases()
             data['Certificates'] = self.aws.acm.list_certificates()
             results['Regions'][region['RegionName']] = data
         return results
