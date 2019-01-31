@@ -77,7 +77,9 @@ IAM
 .. autosummary::
 
    awspice.services.iam.IamService.get_users
+   awspice.services.iam.IamService.get_access_keys
    awspice.services.iam.IamService.get_inactive_users
+   awspice.services.iam.IamService.get_access_key_last_used
 
 
 

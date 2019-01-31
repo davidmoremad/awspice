@@ -64,5 +64,24 @@ class IamService(AwsBase):
 
         return self.inject_client_vars(results, config)
 
+    def get_access_keys(self, user):
+        results = []
+        access_keys = self.client.list_access_keys(UserName=user)['AccessKeyMetadata']
+
+        def worker(ak):
+            ak['LastUse'] = self.get_access_key_last_used(ak['AccessKeyId'])['AccessKeyLastUsed']
+            results.append(ak)
+
+        [self.pool.add_task(worker, ak) for ak in access_keys]
+        self.pool.wait_completion()
+
+        return self.inject_client_vars(results)
+
+    def get_access_key_last_used(self, accesskey):
+        last_use = self.client.get_access_key_last_used(AccessKeyId=accesskey)
+        if last_use:
+            last_use = self.inject_client_vars([last_use])[0]
+        return last_use
+
     def __init__(self):
         AwsBase.__init__(self, 'iam')
