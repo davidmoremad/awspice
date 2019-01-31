@@ -36,6 +36,11 @@ class S3Service(AwsBase):
         return self.inject_client_vars(buckets, config)
 
 
+    def get_bucket_acl(self, bucketname):
+        acl = self.client.get_bucket_acl(Bucket=bucketname)['Grants']
+        return self.inject_client_vars(acl)
+
+
     def get_public_buckets(self):
         '''Get all public buckets and its permissions
         
@@ -57,7 +62,6 @@ class S3Service(AwsBase):
                 bucket_acl = self.client.get_bucket_acl(Bucket=bucket['Name'])
 
                 for grant in bucket_acl['Grants']:
-                    if bucket['Name'] == 'hackforgood':print grant
                     if grant['Grantee']['Type'].lower() == 'group' \
                         and grant['Grantee']['URI'] == global_acl:
                         
