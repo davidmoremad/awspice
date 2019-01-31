@@ -11,6 +11,12 @@ instance_filters = {
     'status': 'instance-state-name',
     'user': 'key-name',
 }
+instance_status_filters = {
+    'event': 'event.code',
+    'status': 'instance-state-name',
+    'instance-check': 'instance-status.status',
+    'system-check': 'system-status.status',
+}
 
 
 def _extract_instances(self, filters=[], regions=[], return_first=False):
@@ -82,10 +88,7 @@ def get_instances_by(self, filters, regions=[], return_first=False):
     Return:
         Instances (lst): List of dictionaries with the instances requested
     '''
-    results = []
-
-    self.validate_filters(filters, self.instance_filters)
-    formatted_filters = [{'Name': self.instance_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = self.validate_filters(filters, self.instance_filters)
     
     if "publicip" in filters.keys():
         ip_in_aws, ip_region = extract_region_from_ip(filters['publicip'])
@@ -104,8 +107,7 @@ def get_instances_by(self, filters, regions=[], return_first=False):
             if ip_region in regions.keys():
                 region = ip_region
 
-    results = self._extract_instances(filters=formatted_filters, regions=regions, return_first=return_first)
-    return results
+    return self._extract_instances(filters=formatted_filters, regions=regions, return_first=return_first)
 
 def create_instances(self, name, key_name, allowed_range, ami=None, distribution=None,
                         version=None, instance_type='t2.micro', region=None, vpc=None, count=1):
@@ -236,3 +238,41 @@ def stop_instances(self, instance_ids, regions=[], force=False):
                 pass
 
     return stopped_instances
+
+# ######################## INSTANCE STATUS ########################
+
+def _extract_instance_status(self, filters=[], regions=[], return_first=False):
+    regions = self.parse_regions(regions)
+    results = dict() if return_first else list()
+    lock = Lock()
+
+    def worker(region):
+        lock.acquire()
+        self.change_region(region['RegionName'])
+        config = self.get_client_vars()
+        lock.release()
+
+        instances = self.client.describe_instance_status(Filters=filters)["InstanceStatuses"]
+        if instances:
+            instances = self.inject_client_vars(instances, config)
+
+            if return_first:
+                results.update(instances[0])
+            if not return_first:
+                results.extend(instances)
+
+    for region in regions: self.pool.add_task(worker, region=region)
+    self.pool.wait_completion()
+    
+    return results
+
+def get_instances_status(self, regions=[]):
+    return self._extract_instance_status(regions=regions)
+
+def get_instance_status_by(self, filters, regions=[]):
+    formatted_filters = self.validate_filters(filters, self.instance_status_filters)
+    return self.get_instances_status_by(filters, regions, return_first=True)
+
+def get_instances_status_by(self, filters, regions=[], return_first=False):
+    formatted_filters = self.validate_filters(filters, self.instance_status_filters)
+    return self._extract_instance_status(filters=formatted_filters, regions=regions, return_first=return_first)

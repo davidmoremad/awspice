@@ -46,9 +46,7 @@ def get_addresses_by(self, filters, regions=[]):
     Returns:
         Addresses (dict): List of dictionaries with the addresses requested
     '''
-    self.validate_filters(filters, self.address_filters)
-    formatted_filters = [{'Name': self.address_filters[k], 'Values': [v]} for k, v in filters.items()]
-    
+    formatted_filters = self.validate_filters(filters, self.address_filters)
     return self._extract_addresses(filters=formatted_filters, regions=regions)
 
 def get_address_by(self, filters, regions=[]):
@@ -61,8 +59,6 @@ def get_address_by(self, filters, regions=[]):
     Returns:
         Address (dict): Dictionary with the address requested
     '''
-    self.validate_filters(filters, self.address_filters)
-    formatted_filters = [{'Name': self.address_filters[k], 'Values': [v]} for k, v in filters.items()]
-
+    formatted_filters = self.validate_filters(filters, self.address_filters)
     return self._extract_addresses(filters=formatted_filters, regions=regions, return_first=True)
 

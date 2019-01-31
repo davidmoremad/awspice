@@ -56,8 +56,7 @@ def get_secgroup_by(self, filters, regions=[]):
     Returns:
         SecurityGroup (dict): Dictionaries with the security group requested
     '''
-    self.validate_filters(filters, self.secgroup_filters)
-    formatted_filters = [{'Name': self.secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = self.validate_filters(filters, self.secgroup_filters)
     return self._extract_secgroups(filters=formatted_filters, regions=regions, return_first=True)
 
 def get_secgroups_by(self, filters, regions=[]):
@@ -71,8 +70,7 @@ def get_secgroups_by(self, filters, regions=[]):
     Returns:
         SecurityGroups (lst): List of dictionaries with the security groups requested
     '''
-    self.validate_filters(filters, self.secgroup_filters)
-    formatted_filters = [{'Name': self.secgroup_filters[k], 'Values': [v]} for k, v in filters.items()]
+    formatted_filters = self.validate_filters(filters, self.secgroup_filters)
     return self._extract_secgroups(filters=formatted_filters, regions=regions)
 
 def create_security_group(self, name, allowed_range, vpc_id=None):

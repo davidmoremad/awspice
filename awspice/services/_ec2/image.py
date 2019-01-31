@@ -103,10 +103,7 @@ def get_amis_by(self, filters, regions=[], return_first=False):
     Return:
         Images (lst): List of requested images
     '''
-
-    self.validate_filters(filters, self.ami_filters)
-    formatted_filters = [{'Name': self.ami_filters[k], 'Values': [v]} for k, v in filters.items()]
-
+    formatted_filters = self.validate_filters(filters, self.ami_filters)
     return self._extract_amis(filters=formatted_filters, regions=regions, return_first=return_first)
     
 def get_amis(self, regions=[]):

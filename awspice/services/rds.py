@@ -40,8 +40,7 @@ class RdsService(AwsBase):
 
 
     def get_database_by(self, filters, regions=[]):
-        self.validate_filters(filters, self.database_filters)
-        formatted_filters = [{'Name': self.database_filters[k], 'Values': [v]} for k, v in filters.items()]
+        formatted_filters = self.validate_filters(filters, self.database_filters)
         return self._extract_databases(filters=formatted_filters, regions=regions, return_first=True)
 
 

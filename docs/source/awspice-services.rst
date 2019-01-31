@@ -37,6 +37,9 @@ EC2
    awspice.services.ec2.Ec2Service.get_instances
    awspice.services.ec2.Ec2Service.get_instance_by
    awspice.services.ec2.Ec2Service.get_instances_by
+   awspice.services.ec2.Ec2Service.get_instances_status
+   awspice.services.ec2.Ec2Service.get_instance_status_by
+   awspice.services.ec2.Ec2Service.get_instances_status_by
    awspice.services.ec2.Ec2Service.create_instances
    awspice.services.ec2.Ec2Service.start_instances
    awspice.services.ec2.Ec2Service.stop_instances
@@ -55,7 +58,6 @@ EC2
    awspice.services.ec2.Ec2Service.get_address_by
    awspice.services.ec2.Ec2Service.get_vpcs
    awspice.services.ec2.Ec2Service.get_default_vpc
-
 
 
 ELB

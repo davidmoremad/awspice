@@ -198,7 +198,7 @@ class AwsBase(object):
     @classmethod
     def validate_filters(cls, input_filters, accepted_filters):
         '''
-        Validate that an item is within a list
+        Transform filters into AWS filters format after validate them.
 
         Args:
             input_filters (str): Items to validate
@@ -210,9 +210,20 @@ class AwsBase(object):
         Raises:
             ValueError: Filter is not in the accepted filter list
         '''
-        for filter_key in input_filters.keys():
-            if filter_key not in accepted_filters:
+        formatted_filters = {}
+
+        for key, value in input_filters.items():
+            if key in accepted_filters:
+                if isinstance(value, list):
+                    formatted_filters.update({'Name': accepted_filters[key], 'Values': value})
+                else:
+                    formatted_filters.update({'Name': accepted_filters[key], 'Values': [value]})
+            else:
                 raise ValueError('Invalid filter key. Allowed filters: ' + str(accepted_filters.keys()))
+        
+        return [formatted_filters]
+
+            
 
 
     # #################################

@@ -46,82 +46,89 @@ class Ec2Service(AwsBase):
     # #################################
     # -------------- AMIS -------------
     # #################################
-    from _ec2.image import ami_filters
-    from _ec2.image import ami_distributions
-    from _ec2.image import distrib_amis
+    from ._ec2.image import ami_filters
+    from ._ec2.image import ami_distributions
+    from ._ec2.image import distrib_amis
 
-    from _ec2.image import _extract_amis
-    from _ec2.image import get_amis
-    from _ec2.image import get_ami_by
-    from _ec2.image import get_amis_by
-    from _ec2.image import get_amis_by_distribution
+    from ._ec2.image import _extract_amis
+    from ._ec2.image import get_amis
+    from ._ec2.image import get_ami_by
+    from ._ec2.image import get_amis_by
+    from ._ec2.image import get_amis_by_distribution
 
 
     # #################################
     # ----------- INSTANCES -----------
     # #################################
-    from _ec2.instance import instance_filters
+    from ._ec2.instance import instance_filters
+    from ._ec2.instance import instance_status_filters
     
-    from _ec2.instance import _extract_instances
-    from _ec2.instance import get_instances
-    from _ec2.instance import get_instance_by
-    from _ec2.instance import get_instances_by
-    from _ec2.instance import start_instances
-    from _ec2.instance import stop_instances
-    from _ec2.instance import create_instances
+    from ._ec2.instance import _extract_instances
+    from ._ec2.instance import get_instances
+    from ._ec2.instance import get_instance_by
+    from ._ec2.instance import get_instances_by
+    from ._ec2.instance import start_instances
+    from ._ec2.instance import stop_instances
+    from ._ec2.instance import create_instances
+
+    from ._ec2.instance import _extract_instance_status
+    from ._ec2.instance import get_instances_status
+    from ._ec2.instance import get_instance_status_by
+    from ._ec2.instance import get_instances_status_by
+    
 
 
     # #################################
     # ------------ VOLUMES ------------
     # #################################
-    from _ec2.volume import volume_filters
+    from ._ec2.volume import volume_filters
 
-    from _ec2.volume import _extract_volumes
-    from _ec2.volume import get_volumes
-    from _ec2.volume import get_volume_by
-    from _ec2.volume import get_volumes_by
+    from ._ec2.volume import _extract_volumes
+    from ._ec2.volume import get_volumes
+    from ._ec2.volume import get_volume_by
+    from ._ec2.volume import get_volumes_by
 
 
     # #################################
     # ----------- SNAPSHOTS -----------
     # #################################
-    from _ec2.snapshot import snapshot_filters
+    from ._ec2.snapshot import snapshot_filters
 
-    from _ec2.snapshot import get_snapshots
-    from _ec2.snapshot import get_snapshot_by
-    from _ec2.snapshot import get_snapshots_by
+    from ._ec2.snapshot import get_snapshots
+    from ._ec2.snapshot import get_snapshot_by
+    from ._ec2.snapshot import get_snapshots_by
 
 
     # #################################
     # ---------- SEC. GROUPS ----------
     # #################################
-    from _ec2.security_group import secgroup_filters
+    from ._ec2.security_group import secgroup_filters
 
-    from _ec2.security_group import _extract_secgroups
-    from _ec2.security_group import get_secgroups
-    from _ec2.security_group import get_secgroup_by
-    from _ec2.security_group import get_secgroups_by
-    from _ec2.security_group import create_security_group
-    from _ec2.security_group import delete_security_group
+    from ._ec2.security_group import _extract_secgroups
+    from ._ec2.security_group import get_secgroups
+    from ._ec2.security_group import get_secgroup_by
+    from ._ec2.security_group import get_secgroups_by
+    from ._ec2.security_group import create_security_group
+    from ._ec2.security_group import delete_security_group
 
 
     # #################################
     # ----------- ADDRESSES -----------
     # #################################
-    from _ec2.address import address_filters
+    from ._ec2.address import address_filters
 
-    from _ec2.address import _extract_addresses
-    from _ec2.address import get_addresses
-    from _ec2.address import get_addresses_by
-    from _ec2.address import get_address_by
+    from ._ec2.address import _extract_addresses
+    from ._ec2.address import get_addresses
+    from ._ec2.address import get_addresses_by
+    from ._ec2.address import get_address_by
     
 
     # #################################
     # ------------- VPCS --------------
     # #################################
-    from _ec2.vpc import _extract_vpcs
-    from _ec2.vpc import get_vpcs
-    from _ec2.vpc import get_default_vpc
+    from ._ec2.vpc import _extract_vpcs
+    from ._ec2.vpc import get_vpcs
+    from ._ec2.vpc import get_default_vpc
 
 
     def __init__(self):

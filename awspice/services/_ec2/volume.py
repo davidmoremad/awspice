@@ -76,8 +76,6 @@ def get_volumes_by(self, filters, regions=[], return_first=False):
     Returns:
         Volume (dict): Dictionary with the volume requested
     '''
-    self.validate_filters(filters, self.volume_filters)
-    filters = [{'Name': volume_filters[k], 'Values': [v]} for k,v in filters.items()]
-
-    return self._extract_volumes(filters=filters, regions=regions, return_first=return_first)
+    formatted_filters = self.validate_filters(filters, self.volume_filters)
+    return self._extract_volumes(filters=formatted_filters, regions=regions, return_first=return_first)
 
