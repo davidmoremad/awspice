@@ -59,8 +59,8 @@ class ElbService(AwsBase):
             elbs = self.client.describe_load_balancers()['LoadBalancerDescriptions']
             results.extend(self.inject_client_vars(elbs, config))
 
-        for region in regions:
-            self.pool.add_task(worker, region)
+        
+        [self.pool.add_task(worker, region) for region in regions]
         self.pool.wait_completion()
 
         return results
@@ -82,9 +82,8 @@ class ElbService(AwsBase):
             for region in self.parse_regions(regions=regions):
                 self.change_region(region)
                 results.extend(self.client.describe_load_balancers(LoadBalancerNames=[filter_value])['LoadBalancerDescriptions'])
-                
 
-        return results if results else list()
+        return results
 
 
     def get_loadbalancer_by(self, filter_key, filter_value, regions=[]):
@@ -103,21 +102,17 @@ class ElbService(AwsBase):
         Return:
             LoadBalancer (dict): Dictionary with the load balancer requested
         '''
-        self.validate_filters(filter_key, self.loadbalancer_filters)
+        if filter_key not in self.loadbalancer_filters:
+            raise ValueError('Invalid filter key. Allowed filters: ' + str(self.loadbalancer_filters.keys()))
 
         if filter_key == 'tagname':
             elbs = self.get_loadbalancer_by(filter_key, filter_value, regions)
-
-        elif filter_key == 'domain' or filter_key == 'cname':
-
+        else:
             cname = self._get_cname_from_domain(filter_value) if filter_key == 'domain' else filter_value
             self.change_region(cname.split('.')[1])
-
             elbs = [elb for elb in self.get_loadbalancers() if elb['DNSName'].lower() == cname.lower()]
 
-        if elbs:
-            return elbs[0]
-        return None
+        return next(iter(elbs or []), None)
 
 
     def __init__(self):
