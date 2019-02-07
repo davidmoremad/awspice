@@ -59,7 +59,7 @@ class StatsModule:
             self.aws.ec2.change_region(region['RegionName'])
 
             savings = dict()
-            savings['Volumes'] = self.aws.ec2.get_volumes_by('status', 'available')
+            savings['Volumes'] = self.aws.ec2.get_volumes_by({'status', 'available'})
             adds = self.aws.ec2.get_addresses()
             savings['Addresses'] = filter(lambda x: x.get('AssociationId') == None, adds)
             elbs = self.aws.elb.get_loadbalancers()
