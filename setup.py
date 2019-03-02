@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 u"""
-Copyright 2018 David Amrani Hernandez
+Copyright 2018 David Amrani Hernandez - ElevenPaths, Telefonica
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ setup(
         "Documentation": "https://awspice.readthedocs.io",
         "Source Code": "https://github.com/davidmoremad/awspice",
     },
-    description='Awspice is a wrapper tool of Boto3 library to list inventory and manage your AWS infrastructure The objective of the wrapper is to abstract the use of AWS, being able to dig through all the data of our account',
+    description='Awspice is a wrapper tool of Boto3 library to list inventory and manage your AWS infrastructure The objective of the wrapper is to abstract the use of AWS, being able to dig through all the data of our account. It belongs to ElevenPaths, Telefonica.',
     long_description=open('README.rst').read(),
     keywords="aws amazon cloud platform boto3 wrapper security management region account",
     license='Apache 2.0',
